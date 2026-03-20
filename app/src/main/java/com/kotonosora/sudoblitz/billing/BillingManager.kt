@@ -2,6 +2,7 @@ package com.kotonosora.sudoblitz.billing
 
 import android.app.Activity
 import android.content.Context
+import android.content.pm.ApplicationInfo
 import com.android.billingclient.api.BillingClient
 import com.android.billingclient.api.BillingClientStateListener
 import com.android.billingclient.api.BillingFlowParams
@@ -20,10 +21,19 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
+data class StoreProduct(
+    val productId: String,
+    val title: String,
+    val price: String,
+    val originalDetails: ProductDetails? = null
+)
+
 class BillingManager(
     private val context: Context,
     private val preferencesRepository: UserPreferencesRepository
 ) : PurchasesUpdatedListener {
+
+    private val isDebug = (context.applicationInfo.flags and ApplicationInfo.FLAG_DEBUGGABLE) != 0
 
     private val pendingPurchasesParams = PendingPurchasesParams.newBuilder()
         .enableOneTimeProducts()
@@ -34,13 +44,17 @@ class BillingManager(
         .enablePendingPurchases(pendingPurchasesParams)
         .build()
 
-    private val _products = MutableStateFlow<List<ProductDetails>>(emptyList())
-    val products: StateFlow<List<ProductDetails>> = _products.asStateFlow()
+    private val _products = MutableStateFlow<List<StoreProduct>>(emptyList())
+    val products: StateFlow<List<StoreProduct>> = _products.asStateFlow()
 
     private val scope = CoroutineScope(Dispatchers.IO)
 
     init {
-        startConnection()
+        if (isDebug) {
+            queryProducts()
+        } else {
+            startConnection()
+        }
     }
 
     private fun startConnection() {
@@ -58,6 +72,22 @@ class BillingManager(
     }
 
     private fun queryProducts() {
+        if (isDebug) {
+            val mockProducts = listOf(
+                StoreProduct("coins_100", "100 Coins", "$0.99"),
+                StoreProduct("coins_500", "500 Coins", "$4.99"),
+                StoreProduct("coins_1000", "1000 Coins", "$9.99"),
+                StoreProduct("coins_1500", "1500 Coins", "$14.99"),
+                StoreProduct("coins_2000", "2000 Coins", "$19.99"),
+                StoreProduct("coins_2500", "2500 Coins", "$24.99"),
+                StoreProduct("coins_3000", "3000 Coins", "$29.99"),
+                StoreProduct("coins_3500", "3500 Coins", "$34.99"),
+                StoreProduct("coins_4000", "4000 Coins", "$39.99")
+            )
+            _products.value = mockProducts
+            return
+        }
+
         val productIds = listOf(
             "coins_100", "coins_500", "coins_1000", "coins_1500",
             "coins_2000", "coins_2500", "coins_3000", "coins_3500", "coins_4000"
@@ -90,16 +120,31 @@ class BillingManager(
                         "coins_4000" -> 4000
                         else -> Int.MAX_VALUE
                     }
+                }.map {
+                    StoreProduct(
+                        productId = it.productId,
+                        title = it.title,
+                        price = it.oneTimePurchaseOfferDetails?.formattedPrice ?: "Unknown",
+                        originalDetails = it
+                    )
                 }
                 _products.value = sortedProducts
             }
         }
     }
 
-    fun launchBillingFlow(activity: Activity, productDetails: ProductDetails) {
+    fun launchBillingFlow(activity: Activity, product: StoreProduct) {
+        if (isDebug && product.originalDetails == null) {
+            // Mock purchase flow
+            grantCoins(listOf(product.productId))
+            return
+        }
+
+        val originalDetails = product.originalDetails ?: return
+
         val productDetailsParamsList = listOf(
             BillingFlowParams.ProductDetailsParams.newBuilder()
-                .setProductDetails(productDetails)
+                .setProductDetails(originalDetails)
                 .build()
         )
 

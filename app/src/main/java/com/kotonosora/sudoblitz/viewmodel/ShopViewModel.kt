@@ -6,8 +6,8 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import com.android.billingclient.api.ProductDetails
 import com.kotonosora.sudoblitz.billing.BillingManager
+import com.kotonosora.sudoblitz.billing.StoreProduct
 import com.kotonosora.sudoblitz.data.UserPreferencesRepository
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -20,14 +20,14 @@ class ShopViewModel(
 
     private val billingManager = BillingManager(application, preferencesRepository)
 
-    val products: StateFlow<List<ProductDetails>> = billingManager.products
+    val products: StateFlow<List<StoreProduct>> = billingManager.products
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
 
     val coins: StateFlow<Int> = preferencesRepository.coinsFlow
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), 0)
 
-    fun buyProduct(activity: Activity, productDetails: ProductDetails) {
-        billingManager.launchBillingFlow(activity, productDetails)
+    fun buyProduct(activity: Activity, product: StoreProduct) {
+        billingManager.launchBillingFlow(activity, product)
     }
 
     override fun onCleared() {

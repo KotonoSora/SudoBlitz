@@ -14,8 +14,9 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.ArrowBack
@@ -39,9 +40,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import com.android.billingclient.api.ProductDetails
+import androidx.compose.ui.unit.sp
+import com.kotonosora.sudoblitz.billing.StoreProduct
 import com.kotonosora.sudoblitz.ui.components.NeonText
+import com.kotonosora.sudoblitz.ui.components.RetroFont
 import com.kotonosora.sudoblitz.ui.theme.CoinGold
 import com.kotonosora.sudoblitz.ui.theme.DarkBackground
 import com.kotonosora.sudoblitz.ui.theme.NeonCyan
@@ -119,8 +124,10 @@ fun ShopScreen(
                     )
                 }
             } else {
-                LazyColumn(
+                LazyVerticalGrid(
+                    columns = GridCells.Fixed(2),
                     contentPadding = PaddingValues(16.dp),
+                    horizontalArrangement = Arrangement.spacedBy(16.dp),
                     verticalArrangement = Arrangement.spacedBy(16.dp),
                     modifier = Modifier.fillMaxWidth()
                 ) {
@@ -138,12 +145,11 @@ fun ShopScreen(
 
 @Composable
 fun ProductItem(
-    product: ProductDetails,
+    product: StoreProduct,
     onPurchaseClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val title = product.title.replace("(SudoBlitz)", "").trim()
-    val price = product.oneTimePurchaseOfferDetails?.formattedPrice ?: "Unknown"
+    val price = product.price
 
     val coinsAmount = when (product.productId) {
         "coins_100" -> 100
@@ -164,45 +170,45 @@ fun ProductItem(
         colors = CardDefaults.cardColors(containerColor = SurfaceDark),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
     ) {
-        Row(
+        Column(
             modifier = Modifier
                 .padding(16.dp)
                 .fillMaxWidth(),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
         ) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                // Coin Icon / Stack
-                Box(
-                    modifier = Modifier
-                        .size(48.dp)
-                        .background(DarkBackground, RoundedCornerShape(12.dp)),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Icon(
-                        imageVector = Icons.Rounded.MonetizationOn,
-                        contentDescription = null,
-                        tint = CoinGold,
-                        modifier = Modifier.size(32.dp)
-                    )
-                }
-
-                Spacer(modifier = Modifier.width(16.dp))
-
-                Column {
-                    NeonText(
-                        text = "$coinsAmount Coins",
-                        color = CoinGold,
-                        fontSize = 16
-                    )
-                    Spacer(modifier = Modifier.height(4.dp))
-                    Text(
-                        text = title,
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = Color.White.copy(alpha = 0.8f)
-                    )
-                }
+            // Coin Icon / Stack
+            Box(
+                modifier = Modifier
+                    .size(64.dp)
+                    .background(DarkBackground, RoundedCornerShape(16.dp)),
+                contentAlignment = Alignment.Center
+            ) {
+                Icon(
+                    imageVector = Icons.Rounded.MonetizationOn,
+                    contentDescription = null,
+                    tint = CoinGold,
+                    modifier = Modifier.size(40.dp)
+                )
             }
+
+            Spacer(modifier = Modifier.height(12.dp))
+
+            NeonText(
+                text = "$coinsAmount",
+                color = CoinGold,
+                fontSize = 14
+            )
+            
+            Spacer(modifier = Modifier.height(4.dp))
+            
+            Text(
+                text = "Coins",
+                style = MaterialTheme.typography.bodyMedium,
+                color = Color.White.copy(alpha = 0.8f)
+            )
+
+            Spacer(modifier = Modifier.height(16.dp))
 
             Button(
                 onClick = onPurchaseClick,
@@ -210,9 +216,20 @@ fun ProductItem(
                 colors = ButtonDefaults.buttonColors(
                     containerColor = NeonMagenta,
                     contentColor = DarkBackground
-                )
+                ),
+                modifier = Modifier.fillMaxWidth(),
+                contentPadding = PaddingValues(horizontal = 4.dp, vertical = 8.dp)
             ) {
-                Text(text = price, fontWeight = FontWeight.Bold)
+                Text(
+                    text = price,
+                    color = DarkBackground,
+                    fontWeight = FontWeight.Bold,
+                    textAlign = TextAlign.Center,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                    fontSize = 14.sp,
+                    fontFamily = RetroFont
+                )
             }
         }
     }
