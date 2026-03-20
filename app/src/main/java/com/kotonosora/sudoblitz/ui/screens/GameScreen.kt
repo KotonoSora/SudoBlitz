@@ -32,6 +32,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.kotonosora.sudoblitz.LocalHapticManager
 import com.kotonosora.sudoblitz.LocalSoundManager
 import com.kotonosora.sudoblitz.ui.components.NeonText
 import com.kotonosora.sudoblitz.ui.components.Numpad
@@ -53,6 +54,7 @@ fun GameScreen(
     val gameState by viewModel.gameState.collectAsState()
     val coins by viewModel.coins.collectAsState()
     val soundManager = LocalSoundManager.current
+    val hapticManager = LocalHapticManager.current
 
     LaunchedEffect(gameState.isGameOver) {
         if (gameState.isGameOver) {
@@ -60,6 +62,7 @@ fun GameScreen(
                 soundManager.playWin()
             } else {
                 soundManager.playLose()
+                hapticManager.vibrate()
             }
             onNavigateToResult()
         }
@@ -69,6 +72,7 @@ fun GameScreen(
     LaunchedEffect(gameState.mistakes) {
         if (gameState.mistakes > previousMistakes) {
             soundManager.playError()
+            hapticManager.vibrate()
             previousMistakes = gameState.mistakes
         }
     }

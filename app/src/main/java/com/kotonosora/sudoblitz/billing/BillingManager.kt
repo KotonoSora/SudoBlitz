@@ -74,15 +74,15 @@ class BillingManager(
     private fun queryProducts() {
         if (isDebug) {
             val mockProducts = listOf(
-                StoreProduct("coins_100", "100 Coins", "$0.99"),
-                StoreProduct("coins_500", "500 Coins", "$4.99"),
-                StoreProduct("coins_1000", "1000 Coins", "$9.99"),
-                StoreProduct("coins_1500", "1500 Coins", "$14.99"),
-                StoreProduct("coins_2000", "2000 Coins", "$19.99"),
-                StoreProduct("coins_2500", "2500 Coins", "$24.99"),
-                StoreProduct("coins_3000", "3000 Coins", "$29.99"),
-                StoreProduct("coins_3500", "3500 Coins", "$34.99"),
-                StoreProduct("coins_4000", "4000 Coins", "$39.99")
+                StoreProduct("coins_100", "100 Coins", "$0.29"),
+                StoreProduct("coins_500", "500 Coins", "$0.49"),
+                StoreProduct("coins_1000", "1000 Coins", "$0.69"),
+                StoreProduct("coins_1500", "1500 Coins", "$0.99"),
+                StoreProduct("coins_2000", "2000 Coins", "$1.99"),
+                StoreProduct("coins_2500", "2500 Coins", "$3.99"),
+                StoreProduct("coins_3000", "3000 Coins", "$4.99"),
+                StoreProduct("coins_3500", "3500 Coins", "$7.99"),
+                StoreProduct("coins_4000", "4000 Coins", "$9.99")
             )
             _products.value = mockProducts
             return

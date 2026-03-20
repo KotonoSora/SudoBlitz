@@ -19,6 +19,8 @@ import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -26,10 +28,19 @@ import com.kotonosora.sudoblitz.ui.components.NeonText
 import com.kotonosora.sudoblitz.ui.components.NeonTitle
 import com.kotonosora.sudoblitz.ui.theme.DarkBackground
 import com.kotonosora.sudoblitz.ui.theme.NeonMagenta
+import com.kotonosora.sudoblitz.viewmodel.SettingsViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SettingsScreen(onBack: () -> Unit, modifier: Modifier = Modifier) {
+fun SettingsScreen(
+    viewModel: SettingsViewModel,
+    onBack: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    val soundEnabled by viewModel.soundEnabled.collectAsState()
+    val musicEnabled by viewModel.musicEnabled.collectAsState()
+    val hapticEnabled by viewModel.hapticEnabled.collectAsState()
+
     Scaffold(
         topBar = {
             TopAppBar(
@@ -58,17 +69,37 @@ fun SettingsScreen(onBack: () -> Unit, modifier: Modifier = Modifier) {
             NeonTitle("SETTINGS", NeonMagenta, fontSize = 32)
             Spacer(modifier = Modifier.height(48.dp))
 
-            SettingToggle("Sound Effects", NeonMagenta, true)
+            SettingToggle(
+                label = "Sound Effects",
+                color = NeonMagenta,
+                checked = soundEnabled,
+                onCheckedChange = { viewModel.toggleSound(it) }
+            )
             Spacer(modifier = Modifier.height(16.dp))
-            SettingToggle("Background Music", NeonMagenta, false)
+            SettingToggle(
+                label = "Background Music",
+                color = NeonMagenta,
+                checked = musicEnabled,
+                onCheckedChange = { viewModel.toggleMusic(it) }
+            )
             Spacer(modifier = Modifier.height(16.dp))
-            SettingToggle("Haptic Feedback", NeonMagenta, true)
+            SettingToggle(
+                label = "Haptic Feedback",
+                color = NeonMagenta,
+                checked = hapticEnabled,
+                onCheckedChange = { viewModel.toggleHaptic(it) }
+            )
         }
     }
 }
 
 @Composable
-fun SettingToggle(label: String, color: androidx.compose.ui.graphics.Color, checked: Boolean) {
+fun SettingToggle(
+    label: String,
+    color: androidx.compose.ui.graphics.Color,
+    checked: Boolean,
+    onCheckedChange: (Boolean) -> Unit
+) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -79,7 +110,7 @@ fun SettingToggle(label: String, color: androidx.compose.ui.graphics.Color, chec
         NeonText(label, color, fontSize = 18)
         Switch(
             checked = checked,
-            onCheckedChange = { },
+            onCheckedChange = onCheckedChange,
             colors = SwitchDefaults.colors(
                 checkedThumbColor = color,
                 checkedTrackColor = color.copy(alpha = 0.3f)

@@ -18,12 +18,14 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.kotonosora.sudoblitz.LocalSoundManager
 import com.kotonosora.sudoblitz.model.Difficulty
 import com.kotonosora.sudoblitz.ui.components.NeonButton
 import com.kotonosora.sudoblitz.ui.components.NeonTitle
 import com.kotonosora.sudoblitz.ui.theme.DarkBackground
 import com.kotonosora.sudoblitz.ui.theme.NeonCyan
 import com.kotonosora.sudoblitz.ui.theme.NeonGreen
+import com.kotonosora.sudoblitz.ui.theme.NeonMagenta
 import com.kotonosora.sudoblitz.ui.theme.NeonRed
 import com.kotonosora.sudoblitz.ui.theme.NeonYellow
 
@@ -34,12 +36,17 @@ fun BoostSelectionScreen(
     onStartGame: (Int, Difficulty) -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val soundManager = LocalSoundManager.current
+    
     Scaffold(
         topBar = {
             TopAppBar(
                 title = { },
                 navigationIcon = {
-                    IconButton(onClick = onBack) {
+                    IconButton(onClick = {
+                        soundManager.playTap()
+                        onBack()
+                    }) {
                         Icon(
                             Icons.AutoMirrored.Rounded.ArrowBack,
                             contentDescription = "Back",
@@ -60,27 +67,46 @@ fun BoostSelectionScreen(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
-            NeonTitle("PREPARE", NeonCyan, fontSize = 40)
-            Spacer(modifier = Modifier.height(48.dp))
+            NeonTitle("CHOOSE LEVEL", NeonCyan, fontSize = 40)
+            Spacer(modifier = Modifier.height(32.dp))
 
             NeonButton(
-                text = "PLAY 4x4 (EASY)",
+                text = "EASY (4x4)",
                 color = NeonGreen,
-                onClick = { onStartGame(4, Difficulty.EASY) }
+                onClick = { 
+                    soundManager.playTap()
+                    onStartGame(4, Difficulty.EASY) 
+                }
             )
             Spacer(modifier = Modifier.height(16.dp))
 
             NeonButton(
-                text = "PLAY 6x6 (MEDIUM)",
+                text = "MEDIUM (6x6)",
                 color = NeonYellow,
-                onClick = { onStartGame(6, Difficulty.MEDIUM) }
+                onClick = { 
+                    soundManager.playTap()
+                    onStartGame(6, Difficulty.MEDIUM) 
+                }
             )
             Spacer(modifier = Modifier.height(16.dp))
 
             NeonButton(
-                text = "PLAY 6x6 (HARD)",
+                text = "HARD (6x6)",
+                color = NeonMagenta,
+                onClick = { 
+                    soundManager.playTap()
+                    onStartGame(6, Difficulty.HARD) 
+                }
+            )
+            Spacer(modifier = Modifier.height(16.dp))
+
+            NeonButton(
+                text = "EXPERT (9x9)",
                 color = NeonRed,
-                onClick = { onStartGame(6, Difficulty.HARD) }
+                onClick = { 
+                    soundManager.playTap()
+                    onStartGame(9, Difficulty.VERY_HARD) 
+                }
             )
         }
     }

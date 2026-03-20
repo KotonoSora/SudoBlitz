@@ -19,7 +19,9 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.kotonosora.sudoblitz.audio.HapticManager
 import com.kotonosora.sudoblitz.audio.SoundManager
+import com.kotonosora.sudoblitz.data.AppDatabase
 import com.kotonosora.sudoblitz.data.UserPreferencesRepository
 import com.kotonosora.sudoblitz.data.dataStore
 import com.kotonosora.sudoblitz.ui.navigation.Screen
@@ -33,10 +35,16 @@ import com.kotonosora.sudoblitz.ui.screens.SettingsScreen
 import com.kotonosora.sudoblitz.ui.screens.ShopScreen
 import com.kotonosora.sudoblitz.ui.theme.SudoBlitzTheme
 import com.kotonosora.sudoblitz.viewmodel.GameViewModel
+import com.kotonosora.sudoblitz.viewmodel.ProgressViewModel
+import com.kotonosora.sudoblitz.viewmodel.SettingsViewModel
 import com.kotonosora.sudoblitz.viewmodel.ShopViewModel
 
 val LocalSoundManager = staticCompositionLocalOf<SoundManager> {
     error("No SoundManager provided")
+}
+
+val LocalHapticManager = staticCompositionLocalOf<HapticManager> {
+    error("No HapticManager provided")
 }
 
 class MainActivity : ComponentActivity() {
@@ -45,20 +53,27 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
 
         val repository = UserPreferencesRepository(applicationContext.dataStore)
+        val database = AppDatabase.getDatabase(applicationContext)
+        val gameRecordDao = database.gameRecordDao()
 
         setContent {
-            val soundManager = remember { SoundManager(applicationContext) }
+            val soundManager = remember { SoundManager(applicationContext, repository) }
+            val hapticManager = remember { HapticManager(applicationContext, repository) }
+            
             DisposableEffect(Unit) {
                 onDispose { soundManager.release() }
             }
 
-            CompositionLocalProvider(LocalSoundManager provides soundManager) {
+            CompositionLocalProvider(
+                LocalSoundManager provides soundManager,
+                LocalHapticManager provides hapticManager
+            ) {
                 SudoBlitzTheme {
                     Surface(
                         modifier = Modifier.fillMaxSize(),
                         color = MaterialTheme.colorScheme.background
                     ) {
-                        SudoBlitzApp(repository, application as android.app.Application)
+                        SudoBlitzApp(repository, gameRecordDao, application as android.app.Application)
                     }
                 }
             }
@@ -67,13 +82,23 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
-fun SudoBlitzApp(repository: UserPreferencesRepository, application: android.app.Application) {
+fun SudoBlitzApp(
+    repository: UserPreferencesRepository,
+    gameRecordDao: com.kotonosora.sudoblitz.data.GameRecordDao,
+    application: android.app.Application
+) {
     val navController = rememberNavController()
     val gameViewModel: GameViewModel = viewModel(
-        factory = GameViewModel.provideFactory(repository)
+        factory = GameViewModel.provideFactory(repository, gameRecordDao)
     )
     val shopViewModel: ShopViewModel = viewModel(
         factory = ShopViewModel.provideFactory(application, repository)
+    )
+    val settingsViewModel: SettingsViewModel = viewModel(
+        factory = SettingsViewModel.provideFactory(repository)
+    )
+    val progressViewModel: ProgressViewModel = viewModel(
+        factory = ProgressViewModel.provideFactory(repository, gameRecordDao)
     )
 
     val soundManager = LocalSoundManager.current
@@ -123,24 +148,36 @@ fun SudoBlitzApp(repository: UserPreferencesRepository, application: android.app
         }
 
         composable(Screen.Progress.route) {
-            ProgressScreen(onBack = {
-                soundManager.playTap()
-                navController.popBackStack()
-            })
+            ProgressScreen(
+                viewModel = progressViewModel,
+                onBack = {
+                    soundManager.playTap()
+                    navController.popBackStack()
+                }
+            )
         }
 
         composable(Screen.DailyChallenge.route) {
-            DailyChallengeScreen(onBack = {
-                soundManager.playTap()
-                navController.popBackStack()
-            })
+            DailyChallengeScreen(
+                onBack = {
+                    soundManager.playTap()
+                    navController.popBackStack()
+                },
+                onStartChallenge = { size, difficulty ->
+                    gameViewModel.startNewGame(size, difficulty)
+                    navController.navigate(Screen.Game.route)
+                }
+            )
         }
 
         composable(Screen.Settings.route) {
-            SettingsScreen(onBack = {
-                soundManager.playTap()
-                navController.popBackStack()
-            })
+            SettingsScreen(
+                viewModel = settingsViewModel,
+                onBack = {
+                    soundManager.playTap()
+                    navController.popBackStack()
+                }
+            )
         }
 
         composable(Screen.Game.route) {

@@ -4,13 +4,21 @@ import android.content.Context
 import android.media.AudioAttributes
 import android.media.SoundPool
 import com.kotonosora.sudoblitz.R
+import com.kotonosora.sudoblitz.data.UserPreferencesRepository
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.launch
 
-class SoundManager(context: Context) {
+class SoundManager(context: Context, private val repository: UserPreferencesRepository) {
     private val soundPool: SoundPool
     private var tapSoundId: Int = 0
     private var errorSoundId: Int = 0
     private var winSoundId: Int = 0
     private var loseSoundId: Int = 0
+    
+    private var soundEnabled = true
+    private val scope = CoroutineScope(Dispatchers.IO)
 
     init {
         val audioAttributes = AudioAttributes.Builder()
@@ -27,22 +35,36 @@ class SoundManager(context: Context) {
         errorSoundId = soundPool.load(context, R.raw.error, 1)
         winSoundId = soundPool.load(context, R.raw.win, 1)
         loseSoundId = soundPool.load(context, R.raw.lose, 1)
+        
+        scope.launch {
+            repository.soundEnabledFlow.collect {
+                soundEnabled = it
+            }
+        }
     }
 
     fun playTap() {
-        soundPool.play(tapSoundId, 1f, 1f, 0, 0, 1f)
+        if (soundEnabled) {
+            soundPool.play(tapSoundId, 1f, 1f, 0, 0, 1f)
+        }
     }
 
     fun playError() {
-        soundPool.play(errorSoundId, 1f, 1f, 0, 0, 1f)
+        if (soundEnabled) {
+            soundPool.play(errorSoundId, 1f, 1f, 0, 0, 1f)
+        }
     }
 
     fun playWin() {
-        soundPool.play(winSoundId, 1f, 1f, 0, 0, 1f)
+        if (soundEnabled) {
+            soundPool.play(winSoundId, 1f, 1f, 0, 0, 1f)
+        }
     }
 
     fun playLose() {
-        soundPool.play(loseSoundId, 1f, 1f, 0, 0, 1f)
+        if (soundEnabled) {
+            soundPool.play(loseSoundId, 1f, 1f, 0, 0, 1f)
+        }
     }
 
     fun release() {

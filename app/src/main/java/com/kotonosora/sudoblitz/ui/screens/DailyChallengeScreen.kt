@@ -18,6 +18,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.kotonosora.sudoblitz.LocalSoundManager
+import com.kotonosora.sudoblitz.model.Difficulty
 import com.kotonosora.sudoblitz.ui.components.NeonButton
 import com.kotonosora.sudoblitz.ui.components.NeonText
 import com.kotonosora.sudoblitz.ui.components.NeonTitle
@@ -26,13 +28,22 @@ import com.kotonosora.sudoblitz.ui.theme.NeonYellow
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun DailyChallengeScreen(onBack: () -> Unit, modifier: Modifier = Modifier) {
+fun DailyChallengeScreen(
+    onBack: () -> Unit,
+    onStartChallenge: (Int, Difficulty) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    val soundManager = LocalSoundManager.current
+
     Scaffold(
         topBar = {
             TopAppBar(
                 title = { },
                 navigationIcon = {
-                    IconButton(onClick = onBack) {
+                    IconButton(onClick = {
+                        soundManager.playTap()
+                        onBack()
+                    }) {
                         Icon(
                             Icons.AutoMirrored.Rounded.ArrowBack,
                             contentDescription = "Back",
@@ -61,7 +72,11 @@ fun DailyChallengeScreen(onBack: () -> Unit, modifier: Modifier = Modifier) {
                 fontSize = 16
             )
             Spacer(modifier = Modifier.height(48.dp))
-            NeonButton("START CHALLENGE", NeonYellow, onClick = { /* TODO */ })
+            NeonButton("START CHALLENGE", NeonYellow, onClick = {
+                soundManager.playTap()
+                // Daily Challenge is always a 6x6 grid on Medium difficulty
+                onStartChallenge(6, Difficulty.MEDIUM)
+            })
         }
     }
 }
