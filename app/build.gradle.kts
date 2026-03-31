@@ -1,5 +1,5 @@
-import java.net.URL
 import java.io.FileOutputStream
+import java.net.URL
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
 
@@ -10,7 +10,7 @@ plugins {
 }
 
 android {
-    namespace = "com.kotonosora.sudoblitz"
+    namespace = "com.graceconsulting.jn.sudoblitz"
     compileSdk {
         version = release(36) {
             minorApiLevel = 1
@@ -18,11 +18,11 @@ android {
     }
 
     defaultConfig {
-        applicationId = "com.kotonosora.sudoblitz"
+        applicationId = "com.graceconsulting.jn.sudoblitz"
         minSdk = 24
         targetSdk = 36
-        versionCode = 1
-        versionName = "1.0"
+        versionCode = 2
+        versionName = "1.1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -98,16 +98,17 @@ tasks.register("generateAssets") {
     doLast {
         val fontDir = file("src/main/res/font")
         fontDir.mkdirs()
-        val fontUrl = URL("https://raw.githubusercontent.com/google/fonts/main/ofl/pressstart2p/PressStart2P-Regular.ttf")
+        val fontUrl =
+            URL("https://raw.githubusercontent.com/google/fonts/main/ofl/pressstart2p/PressStart2P-Regular.ttf")
         fontUrl.openStream().use { input ->
             file("src/main/res/font/press_start_2p.ttf").outputStream().use { output ->
                 input.copyTo(output)
             }
         }
-        
+
         val rawDir = file("src/main/res/raw")
         rawDir.mkdirs()
-        
+
         fun writeWav(name: String, freqFunc: (Double) -> Double, durationMs: Int) {
             val sampleRate = 44100
             val numSamples = (sampleRate * durationMs) / 1000
@@ -115,7 +116,7 @@ tasks.register("generateAssets") {
             FileOutputStream(wavFile).use { out ->
                 val dataSize = numSamples * 2
                 val byteRate = sampleRate * 2
-                
+
                 val header = ByteBuffer.allocate(44).apply {
                     order(ByteOrder.LITTLE_ENDIAN)
                     put("RIFF".toByteArray())
@@ -132,24 +133,25 @@ tasks.register("generateAssets") {
                     put("data".toByteArray())
                     putInt(dataSize)
                 }.array()
-                
+
                 out.write(header)
-                
+
                 val data = ByteBuffer.allocate(dataSize).apply {
                     order(ByteOrder.LITTLE_ENDIAN)
                     for (i in 0 until numSamples) {
                         val t = i.toDouble() / sampleRate
                         val freq = freqFunc(t)
                         // Simple sine wave
-                        val value = (Math.sin(2.0 * Math.PI * freq * t) * 32767.0 * 0.5).toInt().toShort()
+                        val value =
+                            (Math.sin(2.0 * Math.PI * freq * t) * 32767.0 * 0.5).toInt().toShort()
                         putShort(value)
                     }
                 }.array()
-                
+
                 out.write(data)
             }
         }
-        
+
         // Short beep for tap
         writeWav("tap", { 800.0 }, 100)
         // Low buzz for error

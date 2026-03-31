@@ -1,9 +1,9 @@
 ---
 **Document:** Project Brief and Technical Plan — SudoBlitz
-**Version:** 1.2
-**Status:** Active
-**Last Updated:** 2026-03-20
-**Roles:** Software Architect (SA) · Technical Writer (TW)
+  **Version:** 1.2
+  **Status:** Active
+  **Last Updated:** 2026-03-20
+  **Roles:** Software Architect (SA) · Technical Writer (TW)
 
 ---
 
@@ -11,19 +11,19 @@
 
 1. [Project Brief](#1-project-brief)
 2. [Project Plan (Technical Implementation)](#2-project-plan-technical-implementation)
-   - [2.1 System Overview](#21-system-overview)
-   - [2.2 Technology Stack](#22-technology-stack)
-   - [2.3 Architecture Design](#23-architecture-design)
-   - [2.4 Module and Feature Mapping](#24-module-and-feature-mapping)
-   - [2.5 Screen and Navigation Design](#25-screen-and-navigation-design)
-   - [2.6 Data and State Management](#26-data-and-state-management)
-   - [2.7 Google Play Billing Integration](#27-google-play-billing-integration)
-   - [2.8 Core Workflows](#28-core-workflows)
-   - [2.9 Non-Functional Requirements](#29-non-functional-requirements)
-   - [2.10 Technical Constraints and Compliance](#210-technical-constraints-and-compliance)
-   - [2.11 Implementation Guidelines](#211-implementation-guidelines)
-   - [2.12 Risks and Technical Considerations](#212-risks-and-technical-considerations)
-   - [2.13 Architectural Decision Records](#213-architectural-decision-records)
+    - [2.1 System Overview](#21-system-overview)
+    - [2.2 Technology Stack](#22-technology-stack)
+    - [2.3 Architecture Design](#23-architecture-design)
+    - [2.4 Module and Feature Mapping](#24-module-and-feature-mapping)
+    - [2.5 Screen and Navigation Design](#25-screen-and-navigation-design)
+    - [2.6 Data and State Management](#26-data-and-state-management)
+    - [2.7 Google Play Billing Integration](#27-google-play-billing-integration)
+    - [2.8 Core Workflows](#28-core-workflows)
+    - [2.9 Non-Functional Requirements](#29-non-functional-requirements)
+    - [2.10 Technical Constraints and Compliance](#210-technical-constraints-and-compliance)
+    - [2.11 Implementation Guidelines](#211-implementation-guidelines)
+    - [2.12 Risks and Technical Considerations](#212-risks-and-technical-considerations)
+    - [2.13 Architectural Decision Records](#213-architectural-decision-records)
 3. [Glossary](#3-glossary)
 
 ---
@@ -32,9 +32,12 @@
 
 ## Overview
 
-SudoBlitz is a native Android arcade-style Sudoku game built with Kotlin and Jetpack Compose. It delivers short-session puzzle gameplay enhanced with time pressure, streak mechanics, and optional coin-based boosts. The product targets broad casual audiences while maintaining depth for puzzle enthusiasts.
+SudoBlitz is a native Android arcade-style Sudoku game built with Kotlin and Jetpack Compose. It
+delivers short-session puzzle gameplay enhanced with time pressure, streak mechanics, and optional
+coin-based boosts. The product targets broad casual audiences while maintaining depth for puzzle
+enthusiasts.
 
-**Application ID:** `com.kotonosora.sudoblitz`
+**Application ID:** `com.graceconsulting.jn.sudoblitz`
 **Minimum Android Version:** API 24 (Android 7.0 Nougat)
 **Target Android Version:** API 36
 
@@ -42,11 +45,11 @@ SudoBlitz is a native Android arcade-style Sudoku game built with Kotlin and Jet
 
 ## Target Users
 
-| Segment | Behavior Pattern | Value Expectation |
-|---|---|---|
-| Casual mobile players | 1–5 minute sessions | Quick, rewarding, low friction |
-| Puzzle enthusiasts | 5–15 minute sessions | Challenge variation, progression |
-| IAP-open users | Recurring engagement | Meaningful boosts, no pay-to-win |
+| Segment               | Behavior Pattern     | Value Expectation                |
+|-----------------------|----------------------|----------------------------------|
+| Casual mobile players | 1–5 minute sessions  | Quick, rewarding, low friction   |
+| Puzzle enthusiasts    | 5–15 minute sessions | Challenge variation, progression |
+| IAP-open users        | Recurring engagement | Meaningful boosts, no pay-to-win |
 
 ---
 
@@ -63,7 +66,8 @@ SudoBlitz is a native Android arcade-style Sudoku game built with Kotlin and Jet
 
 ## Monetization
 
-The game uses a fully coin-based consumable IAP model. All gameplay features remain accessible without payment; purchases accelerate progression.
+The game uses a fully coin-based consumable IAP model. All gameplay features remain accessible
+without payment; purchases accelerate progression.
 
 **Coins are spent on:**
 
@@ -71,7 +75,10 @@ The game uses a fully coin-based consumable IAP model. All gameplay features rem
 * Cell hints
 * Undo last move
 
-> **Implementation note:** The Revive boost (continue after failure) is not implemented in the current codebase. The three active in-game boosts are: Extra Time (20 coins, +30s), Hint (30 coins), and Undo (15 coins).
+> **Implementation note:** The Revive boost (continue after failure) is not implemented in the
+> current codebase. The three active in-game boosts are: Extra Time (20 coins, +30s), Hint (30
+> coins),
+> and Undo (15 coins).
 
 **Coins are earned by:**
 
@@ -84,17 +91,17 @@ The game uses a fully coin-based consumable IAP model. All gameplay features rem
 
 **IAP products (consumable):**
 
-| Product ID | Price (USD) | Coins Granted | Type |
-|---|---|---|---|
-| `coins_100` | $0.29 | 100 | Consumable |
-| `coins_500` | $0.49 | 500 | Consumable |
-| `coins_1000` | $0.69 | 1,000 | Consumable |
-| `coins_1500` | $0.99 | 1,500 | Consumable |
-| `coins_2000` | $1.99 | 2,000 | Consumable |
-| `coins_2500` | $3.99 | 2,500 | Consumable |
-| `coins_3000` | $4.99 | 3,000 | Consumable |
-| `coins_3500` | $7.99 | 3,500 | Consumable |
-| `coins_4000` | $9.99 | 4,000 | Consumable |
+| Product ID   | Price (USD) | Coins Granted | Type       |
+|--------------|-------------|---------------|------------|
+| `coins_100`  | $0.29       | 100           | Consumable |
+| `coins_500`  | $0.49       | 500           | Consumable |
+| `coins_1000` | $0.69       | 1,000         | Consumable |
+| `coins_1500` | $0.99       | 1,500         | Consumable |
+| `coins_2000` | $1.99       | 2,000         | Consumable |
+| `coins_2500` | $3.99       | 2,500         | Consumable |
+| `coins_3000` | $4.99       | 3,000         | Consumable |
+| `coins_3500` | $7.99       | 3,500         | Consumable |
+| `coins_4000` | $9.99       | 4,000         | Consumable |
 
 ---
 
@@ -112,13 +119,13 @@ The game uses a fully coin-based consumable IAP model. All gameplay features rem
 
 ## Success Criteria
 
-| Metric | Target |
-|---|---|
-| Billing transaction reliability | 0% lost transactions |
-| Input response latency | < 100ms |
-| Session length | 2–4 minutes average |
-| Coin spend rate | ≥ 1 boost per session (engaged users) |
-| Crash-free sessions | ≥ 99% |
+| Metric                          | Target                                |
+|---------------------------------|---------------------------------------|
+| Billing transaction reliability | 0% lost transactions                  |
+| Input response latency          | < 100ms                               |
+| Session length                  | 2–4 minutes average                   |
+| Coin spend rate                 | ≥ 1 boost per session (engaged users) |
+| Crash-free sessions             | ≥ 99%                                 |
 
 ---
 
@@ -126,16 +133,19 @@ The game uses a fully coin-based consumable IAP model. All gameplay features rem
 
 ## 2.1 System Overview
 
-SudoBlitz is a native Android application built on MVVM architecture with reactive state driven by Kotlin StateFlow. The system is structured in four distinct layers with a uni-directional data flow. All inter-layer communication is mediated through well-defined interfaces, ensuring testability and separation of concerns.
+SudoBlitz is a native Android application built on MVVM architecture with reactive state driven by
+Kotlin StateFlow. The system is structured in four distinct layers with a uni-directional data flow.
+All inter-layer communication is mediated through well-defined interfaces, ensuring testability and
+separation of concerns.
 
 **Layer Responsibilities**
 
-| Layer | Responsibility |
-|---|---|
-| UI (Compose) | Render state, emit user events |
-| ViewModel | Transform events into domain calls; expose `StateFlow` |
-| Domain (`SudokuEngine` + ViewModel methods) | Puzzle generation, game logic, boost effects |
-| Data (Repositories) | Abstract storage, billing, and external data access |
+| Layer                                       | Responsibility                                         |
+|---------------------------------------------|--------------------------------------------------------|
+| UI (Compose)                                | Render state, emit user events                         |
+| ViewModel                                   | Transform events into domain calls; expose `StateFlow` |
+| Domain (`SudokuEngine` + ViewModel methods) | Puzzle generation, game logic, boost effects           |
+| Data (Repositories)                         | Abstract storage, billing, and external data access    |
 
 **Data Flow**
 
@@ -147,7 +157,9 @@ Compose UI  →  ViewModel  →  Use Case  →  Repository  →  Data Source
               StateFlow  ←─────────────────── Result
 ```
 
-> All state flows are `StateFlow<UiState>` objects. ViewModels hold the single source of truth for screen state. Shared state (e.g., coin balance) is read from a shared `CoinRepository` by any ViewModel that requires it, rather than passed between ViewModels.
+> All state flows are `StateFlow<UiState>` objects. ViewModels hold the single source of truth for
+> screen state. Shared state (e.g., coin balance) is read from a shared `CoinRepository` by any
+> ViewModel that requires it, rather than passed between ViewModels.
 
 ---
 
@@ -155,43 +167,43 @@ Compose UI  →  ViewModel  →  Use Case  →  Repository  →  Data Source
 
 ### Core Platform
 
-| Technology | Version | Purpose |
-|---|---|---|
-| Kotlin | 2.2.10 | Primary language |
-| Android Gradle Plugin | 9.1.0 | Build tooling |
-| Min SDK | 24 | Android 7.0+ coverage |
-| Target / Compile SDK | 36 | Latest platform features |
+| Technology            | Version | Purpose                  |
+|-----------------------|---------|--------------------------|
+| Kotlin                | 2.2.10  | Primary language         |
+| Android Gradle Plugin | 9.1.0   | Build tooling            |
+| Min SDK               | 24      | Android 7.0+ coverage    |
+| Target / Compile SDK  | 36      | Latest platform features |
 
 ### UI
 
-| Library | Version | Purpose |
-|---|---|---|
-| Jetpack Compose BOM | 2024.09.00 | Compose version alignment |
-| Material3 | (BOM-managed) | UI component system |
-| Navigation Compose | 2.8.9 | Screen routing |
-| Lifecycle ViewModel Compose | 2.8.7 | `viewModel()` in Compose |
-| Lifecycle Runtime Compose | 2.8.7 | `collectAsStateWithLifecycle()` |
+| Library                     | Version       | Purpose                         |
+|-----------------------------|---------------|---------------------------------|
+| Jetpack Compose BOM         | 2024.09.00    | Compose version alignment       |
+| Material3                   | (BOM-managed) | UI component system             |
+| Navigation Compose          | 2.8.9         | Screen routing                  |
+| Lifecycle ViewModel Compose | 2.8.7         | `viewModel()` in Compose        |
+| Lifecycle Runtime Compose   | 2.8.7         | `collectAsStateWithLifecycle()` |
 
 ### Data & Persistence
 
-| Library | Version | Purpose |
-|---|---|---|
-| DataStore Preferences | 1.1.7 | Coin balance, settings |
-| Room Runtime + KTX | 2.7.0 | Stats history (optional) |
-| KSP | 2.3.5 | Code generation (Room, Moshi) |
+| Library               | Version | Purpose                       |
+|-----------------------|---------|-------------------------------|
+| DataStore Preferences | 1.1.7   | Coin balance, settings        |
+| Room Runtime + KTX    | 2.7.0   | Stats history (optional)      |
+| KSP                   | 2.3.5   | Code generation (Room, Moshi) |
 
 ### Concurrency
 
-| Library | Version | Purpose |
-|---|---|---|
-| kotlinx-coroutines-core | 1.10.2 | Structured concurrency |
-| kotlinx-coroutines-android | 1.10.2 | `Dispatchers.Main` integration |
+| Library                    | Version | Purpose                        |
+|----------------------------|---------|--------------------------------|
+| kotlinx-coroutines-core    | 1.10.2  | Structured concurrency         |
+| kotlinx-coroutines-android | 1.10.2  | `Dispatchers.Main` integration |
 
 ### Billing
 
-| Library | Version | Purpose |
-|---|---|---|
-| Play Billing KTX | 7.1.1 | Google Play IAP |
+| Library          | Version | Purpose         |
+|------------------|---------|-----------------|
+| Play Billing KTX | 7.1.1   | Google Play IAP |
 
 ### Dependency Injection
 
@@ -238,15 +250,18 @@ This keeps the setup lightweight and avoids plugin/annotation-processor complexi
 ### UI Layer
 
 * All Composables are **stateless** — they receive `UiState` and emit lambda callbacks
-* State is collected via `collectAsStateWithLifecycle()` to respect lifecycle bounds and avoid resource leaks
+* State is collected via `collectAsStateWithLifecycle()` to respect lifecycle bounds and avoid
+  resource leaks
 * Navigation is handled through a single `NavHost` in `MainActivity`
 
 ### ViewModel Layer
 
 * Four ViewModels: `GameViewModel`, `ShopViewModel`, `ProgressViewModel`, `SettingsViewModel`
-* `GameViewModel` is a **single shared instance** used by `GameScreen`, `ResultScreen`, and `DailyChallengeScreen`
+* `GameViewModel` is a **single shared instance** used by `GameScreen`, `ResultScreen`, and
+  `DailyChallengeScreen`
 * ViewModels expose `StateFlow` for state; they use `viewModelScope` for all coroutines
-* `SavedStateHandle` is **not used** in the current codebase — game state is lost on process death (post-MVP item)
+* `SavedStateHandle` is **not used** in the current codebase — game state is lost on process death (
+  post-MVP item)
 
 ### Domain Layer
 
@@ -256,16 +271,16 @@ This keeps the setup lightweight and avoids plugin/annotation-processor complexi
 
 **Engine & ViewModel Method Inventory**
 
-| Component | Method | Responsibility |
-|---|---|---|
-| `SudokuEngine` | `generateBoard(size, difficulty)` | Backtracking with shuffled candidates + unique-solution verification |
-| `GameViewModel` | `startNewGame(size, difficulty)` | Generates board via `SudokuEngine`; sets timer; resets state |
-| `GameViewModel` | `inputNumber(number)` | Validates input; updates score (+10 × combo), combo, mistakes |
-| `GameViewModel` | `addTime()` | 20 coins → +30 seconds to `timeRemaining` |
-| `GameViewModel` | `useHint()` | 30 coins → fills first empty/error cell with `correctValue` |
-| `GameViewModel` | `undoMistake()` | 15 coins → clears last error cell; `mistakes - 1` |
-| `GameViewModel` | `nextLevel()` | Same size/difficulty; `streak + 1`; bonus time = `startingTime / 2` |
-| `GameViewModel` | `endGame(victory)` | Saves `GameRecord` to Room; grants coins on victory; updates DataStore |
+| Component       | Method                            | Responsibility                                                         |
+|-----------------|-----------------------------------|------------------------------------------------------------------------|
+| `SudokuEngine`  | `generateBoard(size, difficulty)` | Backtracking with shuffled candidates + unique-solution verification   |
+| `GameViewModel` | `startNewGame(size, difficulty)`  | Generates board via `SudokuEngine`; sets timer; resets state           |
+| `GameViewModel` | `inputNumber(number)`             | Validates input; updates score (+10 × combo), combo, mistakes          |
+| `GameViewModel` | `addTime()`                       | 20 coins → +30 seconds to `timeRemaining`                              |
+| `GameViewModel` | `useHint()`                       | 30 coins → fills first empty/error cell with `correctValue`            |
+| `GameViewModel` | `undoMistake()`                   | 15 coins → clears last error cell; `mistakes - 1`                      |
+| `GameViewModel` | `nextLevel()`                     | Same size/difficulty; `streak + 1`; bonus time = `startingTime / 2`    |
+| `GameViewModel` | `endGame(victory)`                | Saves `GameRecord` to Room; grants coins on victory; updates DataStore |
 
 ### Data Layer
 
@@ -290,11 +305,13 @@ class UserPreferencesRepository(context: Context) {
 }
 
 // GameRecordDao (Room — "game_records" table)
-@Dao interface GameRecordDao {
+@Dao
+interface GameRecordDao {
     @Query("SELECT * FROM game_records ORDER BY timestamp DESC LIMIT 50")
     fun getRecentRecords(): Flow<List<GameRecord>>
 
-    @Insert suspend fun insertRecord(record: GameRecord)
+    @Insert
+    suspend fun insertRecord(record: GameRecord)
 
     @Query("SELECT MAX(score) FROM game_records")
     fun getHighScore(): Flow<Int?>
@@ -311,13 +328,13 @@ class BillingManager(context, preferencesRepository) : PurchasesUpdatedListener 
 
 **Threading Model**
 
-| Operation | Dispatcher |
-|---|---|
-| DataStore reads/writes | `Dispatchers.IO` |
-| Room queries | `Dispatchers.IO` |
-| Sudoku generation | `Dispatchers.Default` |
-| BillingClient callbacks | `Dispatchers.Main` (Play enforces this) |
-| StateFlow collection | `Dispatchers.Main` via `collectAsStateWithLifecycle` |
+| Operation               | Dispatcher                                           |
+|-------------------------|------------------------------------------------------|
+| DataStore reads/writes  | `Dispatchers.IO`                                     |
+| Room queries            | `Dispatchers.IO`                                     |
+| Sudoku generation       | `Dispatchers.Default`                                |
+| BillingClient callbacks | `Dispatchers.Main` (Play enforces this)              |
+| StateFlow collection    | `Dispatchers.Main` via `collectAsStateWithLifecycle` |
 
 ---
 
@@ -325,41 +342,45 @@ class BillingManager(context, preferencesRepository) : PurchasesUpdatedListener 
 
 ### Game Module (`feature/game`)
 
-| Component | Responsibility |
-|---|---|
-| `SudokuEngine` (object) | Backtracking generation; unique-solution verification; sizes 4×4, 6×6, 9×9 |
-| `GameViewModel` | Timer (coroutine), mistake tracking, combo multiplier, scoring, boost logic |
-| `SudokuModels.kt` | `Cell`, `Board`, `Difficulty` (EASY/MEDIUM/HARD/VERY_HARD) |
+| Component               | Responsibility                                                              |
+|-------------------------|-----------------------------------------------------------------------------|
+| `SudokuEngine` (object) | Backtracking generation; unique-solution verification; sizes 4×4, 6×6, 9×9  |
+| `GameViewModel`         | Timer (coroutine), mistake tracking, combo multiplier, scoring, boost logic |
+| `SudokuModels.kt`       | `Cell`, `Board`, `Difficulty` (EASY/MEDIUM/HARD/VERY_HARD)                  |
 
 ### Economy Module (`feature/economy`)
 
-| Component | Responsibility |
-|---|---|
-| `UserPreferencesRepository` | Coin balance reads/writes via DataStore; `coerceAtLeast(0)` prevents negatives |
-| `GameViewModel.addTime()` | 20 coins → +30 seconds |
-| `GameViewModel.useHint()` | 30 coins → reveal first empty/error cell |
-| `GameViewModel.undoMistake()` | 15 coins → clear last error cell; `mistakes - 1` |
+| Component                     | Responsibility                                                                 |
+|-------------------------------|--------------------------------------------------------------------------------|
+| `UserPreferencesRepository`   | Coin balance reads/writes via DataStore; `coerceAtLeast(0)` prevents negatives |
+| `GameViewModel.addTime()`     | 20 coins → +30 seconds                                                         |
+| `GameViewModel.useHint()`     | 30 coins → reveal first empty/error cell                                       |
+| `GameViewModel.undoMistake()` | 15 coins → clear last error cell; `mistakes - 1`                               |
 
 ### Billing Module — Critical Path (`feature/billing`)
 
-| Component | Responsibility |
-|---|---|
+| Component        | Responsibility                                                                                 |
+|------------------|------------------------------------------------------------------------------------------------|
 | `BillingManager` | `PurchasesUpdatedListener`; `BillingClient` lifecycle; product query; consumeAsync; coin grant |
-| `ShopViewModel` | `AndroidViewModel`; holds `BillingManager`; disconnects in `onCleared()` |
+| `ShopViewModel`  | `AndroidViewModel`; holds `BillingManager`; disconnects in `onCleared()`                       |
 
-> **Lifecycle note:** `BillingManager` is initialized in `ShopViewModel` and disconnected via `onCleared()`. Reconnect on `onBillingServiceDisconnected` is **not implemented** — this is post-MVP work needed before production scale.
+> **Lifecycle note:** `BillingManager` is initialized in `ShopViewModel` and disconnected via
+`onCleared()`. Reconnect on `onBillingServiceDisconnected` is **not implemented** — this is post-MVP
+> work needed before production scale.
 
 ### Persistence Module (`data/persistence`)
 
-| Component | Responsibility |
-|---|---|
-| `UserPreferencesRepository` | Single `PreferencesDataStore` (name: `"user_stats"`); manages 6 preference keys |
-| `AppDatabase` v1 (Room) | Singleton via double-checked locking; entity: `GameRecord`; DAO: `GameRecordDao` |
+| Component                   | Responsibility                                                                   |
+|-----------------------------|----------------------------------------------------------------------------------|
+| `UserPreferencesRepository` | Single `PreferencesDataStore` (name: `"user_stats"`); manages 6 preference keys  |
+| `AppDatabase` v1 (Room)     | Singleton via double-checked locking; entity: `GameRecord`; DAO: `GameRecordDao` |
 
 ### UI Module (`ui/`)
 
-* 8 Compose screens; 4 have dedicated ViewModels (`GameViewModel`, `ShopViewModel`, `ProgressViewModel`, `SettingsViewModel`)
-* `SoundManager` + `HapticManager` provided globally via `CompositionLocal` (`LocalSoundManager`, `LocalHapticManager`)
+* 8 Compose screens; 4 have dedicated ViewModels (`GameViewModel`, `ShopViewModel`,
+  `ProgressViewModel`, `SettingsViewModel`)
+* `SoundManager` + `HapticManager` provided globally via `CompositionLocal` (`LocalSoundManager`,
+  `LocalHapticManager`)
 * Shared composables: `SudokuGrid`, `Numpad`, `NeonButton`, `NeonTitle`, `NeonText`
 
 ---
@@ -386,20 +407,22 @@ UI Module
 
 ## 2.5 Screen and Navigation Design
 
-**Navigation implementation:** Jetpack Compose Navigation (`NavHost`) with string route constants defined in `sealed class Screen` (`ui/navigation/Screen.kt`). The `NavHost` lives inside the `SudoBlitzApp` composable in `MainActivity`.
+**Navigation implementation:** Jetpack Compose Navigation (`NavHost`) with string route constants
+defined in `sealed class Screen` (`ui/navigation/Screen.kt`). The `NavHost` lives inside the
+`SudoBlitzApp` composable in `MainActivity`.
 
 ### Screen Inventory
 
-| # | Composable | Route String | Entry Point | ViewModel |
-|---|---|---|---|---|
-| 1 | `HomeScreen` | `"home"` | App launch, back-stack root | None (stateless; receives `coins: Int`) |
-| 2 | `BoostSelectionScreen` | `"boost_selection"` | Home → "PLAY GAME" | None (stateless) |
-| 3 | `GameScreen` | `"game"` | BoostSelection → level select; DailyChallenge → start | `GameViewModel` (shared) |
-| 4 | `ResultScreen` | `"result"` | Game → `isGameOver == true` or `isVictory == true` | None (reads `GameViewModel.gameState`) |
-| 5 | `ShopScreen` | `"shop"` | Home → cart icon in top bar | `ShopViewModel` |
-| 6 | `DailyChallengeScreen` | `"daily_challenge"` | Home → "DAILY CHALLENGE" | None |
-| 7 | `ProgressScreen` | `"progress"` | Home → "LEADERBOARD" | `ProgressViewModel` |
-| 8 | `SettingsScreen` | `"settings"` | Home → "SETTINGS" | `SettingsViewModel` |
+| # | Composable             | Route String        | Entry Point                                           | ViewModel                               |
+|---|------------------------|---------------------|-------------------------------------------------------|-----------------------------------------|
+| 1 | `HomeScreen`           | `"home"`            | App launch, back-stack root                           | None (stateless; receives `coins: Int`) |
+| 2 | `BoostSelectionScreen` | `"boost_selection"` | Home → "PLAY GAME"                                    | None (stateless)                        |
+| 3 | `GameScreen`           | `"game"`            | BoostSelection → level select; DailyChallenge → start | `GameViewModel` (shared)                |
+| 4 | `ResultScreen`         | `"result"`          | Game → `isGameOver == true` or `isVictory == true`    | None (reads `GameViewModel.gameState`)  |
+| 5 | `ShopScreen`           | `"shop"`            | Home → cart icon in top bar                           | `ShopViewModel`                         |
+| 6 | `DailyChallengeScreen` | `"daily_challenge"` | Home → "DAILY CHALLENGE"                              | None                                    |
+| 7 | `ProgressScreen`       | `"progress"`        | Home → "LEADERBOARD"                                  | `ProgressViewModel`                     |
+| 8 | `SettingsScreen`       | `"settings"`        | Home → "SETTINGS"                                     | `SettingsViewModel`                     |
 
 ### Navigation Flow
 
@@ -422,9 +445,12 @@ Result:
 
 **Back-stack rules:**
 
-* `Screen.Game` is popped inclusive when navigating to `Screen.Result` — back button on Result goes to Home, not Game
-* `GameViewModel` is shared by `GameScreen`, `ResultScreen`, and `DailyChallengeScreen`; it is NOT recreated on navigation between these
-* No navigation arguments are passed to `Screen.Game` — `GameViewModel.startNewGame(size, difficulty)` is called before `navController.navigate("game")`
+* `Screen.Game` is popped inclusive when navigating to `Screen.Result` — back button on Result goes
+  to Home, not Game
+* `GameViewModel` is shared by `GameScreen`, `ResultScreen`, and `DailyChallengeScreen`; it is NOT
+  recreated on navigation between these
+* No navigation arguments are passed to `Screen.Game` —
+  `GameViewModel.startNewGame(size, difficulty)` is called before `navController.navigate("game")`
 * Deep links are not required for MVP
 
 ---
@@ -467,40 +493,43 @@ data class Cell(
 
 DataStore name: `"user_stats"` (via `preferencesDataStore` delegate).
 
-| Preferences Key | Type | Default | Description |
-|---|---|---|---|
-| `coins` | `Int` | **100** | Current coin balance; new install starts with 100 |
-| `high_score` | `Int` | `0` | All-time highest score across all sessions |
-| `best_streak` | `Int` | `0` | All-time best consecutive level streak |
-| `sound_enabled` | `Boolean` | `true` | Sound effects toggle |
-| `music_enabled` | `Boolean` | `true` | Music toggle (stored; player not yet implemented) |
-| `haptic_enabled` | `Boolean` | `true` | Haptic feedback toggle |
+| Preferences Key  | Type      | Default | Description                                       |
+|------------------|-----------|---------|---------------------------------------------------|
+| `coins`          | `Int`     | **100** | Current coin balance; new install starts with 100 |
+| `high_score`     | `Int`     | `0`     | All-time highest score across all sessions        |
+| `best_streak`    | `Int`     | `0`     | All-time best consecutive level streak            |
+| `sound_enabled`  | `Boolean` | `true`  | Sound effects toggle                              |
+| `music_enabled`  | `Boolean` | `true`  | Music toggle (stored; player not yet implemented) |
+| `haptic_enabled` | `Boolean` | `true`  | Haptic feedback toggle                            |
 
 **Room Database — `AppDatabase` v1**
 
 `game_records` table (entity class: `GameRecord`):
 
-| Column | Type | Notes |
-|---|---|---|
-| `id` | `INTEGER PRIMARY KEY AUTOINCREMENT` | |
-| `timestamp` | `INTEGER` | Epoch milliseconds (`System.currentTimeMillis()`) |
-| `difficulty` | `TEXT` | `EASY / MEDIUM / HARD / VERY_HARD` |
-| `size` | `INTEGER` | 4, 6, or 9 |
-| `score` | `INTEGER` | Final session score |
-| `isVictory` | `INTEGER` | Boolean: 1 = victory, 0 = loss |
+| Column       | Type                                | Notes                                             |
+|--------------|-------------------------------------|---------------------------------------------------|
+| `id`         | `INTEGER PRIMARY KEY AUTOINCREMENT` |                                                   |
+| `timestamp`  | `INTEGER`                           | Epoch milliseconds (`System.currentTimeMillis()`) |
+| `difficulty` | `TEXT`                              | `EASY / MEDIUM / HARD / VERY_HARD`                |
+| `size`       | `INTEGER`                           | 4, 6, or 9                                        |
+| `score`      | `INTEGER`                           | Final session score                               |
+| `isVictory`  | `INTEGER`                           | Boolean: 1 = victory, 0 = loss                    |
 
 ### State Management Principles
 
 * `StateFlow` is the primary mechanism for exposing observable state from ViewModels
-* Navigation events are triggered directly via lambda callbacks to `navController` — no `SharedFlow` event bus
-* `SavedStateHandle` is **not used** in the current codebase; active `GameState` is held in-memory only. Game state is lost if the OS kills the process. This is documented as post-MVP work.
+* Navigation events are triggered directly via lambda callbacks to `navController` — no `SharedFlow`
+  event bus
+* `SavedStateHandle` is **not used** in the current codebase; active `GameState` is held in-memory
+  only. Game state is lost if the OS kills the process. This is documented as post-MVP work.
 
 ---
 
 ## 2.7 Google Play Billing Integration
 
 > **Billing Library version:** 7.1.1 (Play Billing KTX)
-> This section is the **critical path** for the product. Errors here cause financial and reputational risk.
+> This section is the **critical path** for the product. Errors here cause financial and
+> reputational risk.
 
 ### BillingClient Lifecycle
 
@@ -515,7 +544,9 @@ ShopViewModel.onCleared():
     └─→ BillingManager.endConnection() → billingClient.endConnection()
 ```
 
-> **Known gap:** Reconnect logic on `onBillingServiceDisconnected` is **not yet implemented**. `queryPurchasesAsync` on reconnect (for pending purchase recovery) is also absent. Both are required before production scale.
+> **Known gap:** Reconnect logic on `onBillingServiceDisconnected` is **not yet implemented**.
+`queryPurchasesAsync` on reconnect (for pending purchase recovery) is also absent. Both are required
+> before production scale.
 
 ### Product Query
 
@@ -525,17 +556,17 @@ ShopViewModel.onCleared():
 
 **Product ID to coin mapping:**
 
-| Product ID | Price (USD) | Coins |
-|---|---|---|
-| `coins_100` | $0.29 | 100 |
-| `coins_500` | $0.49 | 500 |
-| `coins_1000` | $0.69 | 1,000 |
-| `coins_1500` | $0.99 | 1,500 |
-| `coins_2000` | $1.99 | 2,000 |
-| `coins_2500` | $3.99 | 2,500 |
-| `coins_3000` | $4.99 | 3,000 |
-| `coins_3500` | $7.99 | 3,500 |
-| `coins_4000` | $9.99 | 4,000 |
+| Product ID   | Price (USD) | Coins |
+|--------------|-------------|-------|
+| `coins_100`  | $0.29       | 100   |
+| `coins_500`  | $0.49       | 500   |
+| `coins_1000` | $0.69       | 1,000 |
+| `coins_1500` | $0.99       | 1,500 |
+| `coins_2000` | $1.99       | 2,000 |
+| `coins_2500` | $3.99       | 2,500 |
+| `coins_3000` | $4.99       | 3,000 |
+| `coins_3500` | $7.99       | 3,500 |
+| `coins_4000` | $9.99       | 4,000 |
 
 ### Purchase Flow (State Machine)
 
@@ -555,14 +586,15 @@ ShopViewModel.buyProduct(activity, product)
 
 ### Known Billing Gaps (Post-MVP)
 
-| Gap | Risk | Status |
-|---|---|---|
-| No reconnect on `onBillingServiceDisconnected` | Purchase flow fails if Play Store disconnects mid-session | Not implemented |
-| No pending purchase recovery (`queryPurchasesAsync`) | Purchases may be lost on process death during flow | Not implemented |
-| No purchase token deduplication | Potential duplicate coin grants on retry | Not implemented |
-| No server-side receipt validation | Fraud risk at scale | Intentional deferral to post-MVP |
+| Gap                                                  | Risk                                                      | Status                           |
+|------------------------------------------------------|-----------------------------------------------------------|----------------------------------|
+| No reconnect on `onBillingServiceDisconnected`       | Purchase flow fails if Play Store disconnects mid-session | Not implemented                  |
+| No pending purchase recovery (`queryPurchasesAsync`) | Purchases may be lost on process death during flow        | Not implemented                  |
+| No purchase token deduplication                      | Potential duplicate coin grants on retry                  | Not implemented                  |
+| No server-side receipt validation                    | Fraud risk at scale                                       | Intentional deferral to post-MVP |
 
-**Security constraint (currently enforced):** `updateCoins()` is called **only after** `consumeAsync()` succeeds, in both debug (immediate mock) and release builds.
+**Security constraint (currently enforced):** `updateCoins()` is called **only after**
+`consumeAsync()` succeeds, in both debug (immediate mock) and release builds.
 
 ---
 
@@ -633,7 +665,8 @@ GameViewModel method: addTime() / useHint() / undoMistake()
 
 ### Coin Earning
 
-Coins are granted **only on victory** inside `endGame(victory=true)`, before navigation to `ResultScreen`.
+Coins are granted **only on victory** inside `endGame(victory=true)`, before navigation to
+`ResultScreen`.
 
 **Formula:** `coinsEarned = 10 + (timeRemaining / 10) + currentSize`
 
@@ -645,35 +678,37 @@ Failed sessions (mistake limit or timer) earn 0 coins and reset `streak` to 0.
 
 ### Performance
 
-| Requirement | Target | Measurement |
-|---|---|---|
-| Input response latency | < 100ms from tap to visual feedback | Manual test on mid-range device (API 24) |
-| Sudoku generation time | < 500ms for 9×9 (Hard) | Unit test with `measureTimeMillis` |
-| Cold start to HomeScreen | < 2 seconds | Android vitals / systrace |
-| Compose recomposition rate | No unnecessary full-screen recompositions on cell tap | Layout inspector |
+| Requirement                | Target                                                | Measurement                              |
+|----------------------------|-------------------------------------------------------|------------------------------------------|
+| Input response latency     | < 100ms from tap to visual feedback                   | Manual test on mid-range device (API 24) |
+| Sudoku generation time     | < 500ms for 9×9 (Hard)                                | Unit test with `measureTimeMillis`       |
+| Cold start to HomeScreen   | < 2 seconds                                           | Android vitals / systrace                |
+| Compose recomposition rate | No unnecessary full-screen recompositions on cell tap | Layout inspector                         |
 
 ### Reliability
 
-| Requirement | Target |
-|---|---|
-| Billing transaction loss | 0% — pending purchase recovery on reconnect |
-| Duplicate coin grants | 0% — token deduplication enforced |
-| Crash-free sessions | ≥ 99% |
+| Requirement                 | Target                                                    |
+|-----------------------------|-----------------------------------------------------------|
+| Billing transaction loss    | 0% — pending purchase recovery on reconnect               |
+| Duplicate coin grants       | 0% — token deduplication enforced                         |
+| Crash-free sessions         | ≥ 99%                                                     |
 | Process-death game recovery | Active game survives process death via `SavedStateHandle` |
 
 ### Security
 
-| Requirement | Implementation |
-|---|---|
-| Coins granted only on verified purchase | `consumeAsync()` must succeed before `updateCoins()` is called |
-| No negative coin balance | `updateCoins(delta)` uses `.coerceAtLeast(0)` |
-| Debug/release isolation | `BuildConfig.DEBUG` flag in `BillingManager.init`; mock flow only in debug |
-| Token replay prevention | **Not yet implemented** — documented as post-MVP technical debt |
+| Requirement                             | Implementation                                                             |
+|-----------------------------------------|----------------------------------------------------------------------------|
+| Coins granted only on verified purchase | `consumeAsync()` must succeed before `updateCoins()` is called             |
+| No negative coin balance                | `updateCoins(delta)` uses `.coerceAtLeast(0)`                              |
+| Debug/release isolation                 | `BuildConfig.DEBUG` flag in `BillingManager.init`; mock flow only in debug |
+| Token replay prevention                 | **Not yet implemented** — documented as post-MVP technical debt            |
 
 ### Maintainability
 
-* `SudokuEngine` (object) has zero Android imports — fully unit-testable on JVM without instrumentation
-* ViewModels contain minimal Android framework dependencies — primary dependency is `AndroidViewModel` (required by `ShopViewModel` for Application context in `BillingManager`)
+* `SudokuEngine` (object) has zero Android imports — fully unit-testable on JVM without
+  instrumentation
+* ViewModels contain minimal Android framework dependencies — primary dependency is
+  `AndroidViewModel` (required by `ShopViewModel` for Application context in `BillingManager`)
 * `UserPreferencesRepository` and `GameRecordDao` can be mocked in tests via constructor injection
 
 ---
@@ -692,14 +727,16 @@ Failed sessions (mistake limit or timer) earn 0 coins and reset `streak` to 0.
 
 **Google Play Billing Compliance**
 
-* All consumable products must be consumed via `BillingClient.consumeAsync()` before coins are granted
+* All consumable products must be consumed via `BillingClient.consumeAsync()` before coins are
+  granted
 * Purchases must never remain unacknowledged for more than 3 days (Play policy)
 * The app must handle `ITEM_ALREADY_OWNED` by attempting consumption (necessary for consumables)
 * Billing Library 7.x requires all `BillingClient` operations on main thread
 
 **Proguard / R8**
 
-* `billing-ktx` classes must be kept in ProGuard rules to prevent obfuscation of Play Billing interfaces
+* `billing-ktx` classes must be kept in ProGuard rules to prevent obfuscation of Play Billing
+  interfaces
 * Room entity classes must be kept
 
 ---
@@ -709,7 +746,7 @@ Failed sessions (mistake limit or timer) earn 0 coins and reset `streak` to 0.
 ### Code Structure (Package Layout)
 
 ```
-com.kotonosora.sudoblitz
+com.graceconsulting.jn.sudoblitz
 ├── MainActivity.kt
 │   └── SudoBlitzApp()       // NavHost + ViewModel provisioning
 │   └── LocalSoundManager    // CompositionLocal<SoundManager>
@@ -749,65 +786,69 @@ com.kotonosora.sudoblitz
 
 ### Best Practices
 
-* **Immutable UI state**: `UiState` data classes use only `val` fields; mutation produces a new instance via `copy()`
-* **Unidirectional data flow**: UI emits events (function calls), ViewModel processes them and emits new state
-* **No business logic in Composables**: Composables call ViewModel functions; they do not contain conditions or calculations beyond display formatting
-* **Coroutine scope discipline**: Only `viewModelScope` and `lifecycleScope` are used; no `GlobalScope`
+* **Immutable UI state**: `UiState` data classes use only `val` fields; mutation produces a new
+  instance via `copy()`
+* **Unidirectional data flow**: UI emits events (function calls), ViewModel processes them and emits
+  new state
+* **No business logic in Composables**: Composables call ViewModel functions; they do not contain
+  conditions or calculations beyond display formatting
+* **Coroutine scope discipline**: Only `viewModelScope` and `lifecycleScope` are used; no
+  `GlobalScope`
 
 ### Shared Composables
 
-| Component | Key Props | Screens |
-|---|---|---|
-| `SudokuGrid` | `board: Board`, `selectedCell: Cell?`, `onCellSelected` | `GameScreen`, `DailyChallengeScreen` |
-| `Numpad` | `size: Int`, `onNumberSelected` | `GameScreen`, `DailyChallengeScreen` |
-| `NeonButton` | `text`, `color`, `icon?`, `onClick`, `enabled` | All screens |
-| `NeonTitle` | `text`, `color`, `fontSize` | All screens (glow shadow, Press Start 2P) |
-| `NeonText` | `text`, `color`, `fontSize`, `fontWeight` | All screens |
+| Component    | Key Props                                               | Screens                                   |
+|--------------|---------------------------------------------------------|-------------------------------------------|
+| `SudokuGrid` | `board: Board`, `selectedCell: Cell?`, `onCellSelected` | `GameScreen`, `DailyChallengeScreen`      |
+| `Numpad`     | `size: Int`, `onNumberSelected`                         | `GameScreen`, `DailyChallengeScreen`      |
+| `NeonButton` | `text`, `color`, `icon?`, `onClick`, `enabled`          | All screens                               |
+| `NeonTitle`  | `text`, `color`, `fontSize`                             | All screens (glow shadow, Press Start 2P) |
+| `NeonText`   | `text`, `color`, `fontSize`, `fontWeight`               | All screens                               |
 
 ### Testing Strategy
 
 **Unit Tests** (JVM, no Android framework)
 
-| Test | Coverage Target |
-|---|---|
-| `SudokuGeneratorTest` — valid puzzle, unique solution | Core algorithm correctness |
-| `SudokuValidatorTest` — correct / incorrect / complete detection | All validation branches |
-| `CalculateScoreUseCaseTest` — time bonus, combo multiplier, difficulty | Score formula correctness |
-| `ManageCoinsUseCaseTest` — deduct insufficient, deduct sufficient, add | Economy invariants |
-| `ApplyBoostUseCaseTest` — each boost type | Boost effect application |
-| `CoinBalanceTest` — negative guard | Value class invariant |
+| Test                                                                   | Coverage Target            |
+|------------------------------------------------------------------------|----------------------------|
+| `SudokuGeneratorTest` — valid puzzle, unique solution                  | Core algorithm correctness |
+| `SudokuValidatorTest` — correct / incorrect / complete detection       | All validation branches    |
+| `CalculateScoreUseCaseTest` — time bonus, combo multiplier, difficulty | Score formula correctness  |
+| `ManageCoinsUseCaseTest` — deduct insufficient, deduct sufficient, add | Economy invariants         |
+| `ApplyBoostUseCaseTest` — each boost type                              | Boost effect application   |
+| `CoinBalanceTest` — negative guard                                     | Value class invariant      |
 
 **Integration Tests** (Android JVM with Robolectric or `kotlinx-coroutines-test`)
 
-| Test | Coverage Target |
-|---|---|
+| Test                                             | Coverage Target                 |
+|--------------------------------------------------|---------------------------------|
 | `BillingRepositoryTest` — mocked `BillingClient` | Purchase flow state transitions |
-| `CoinRepositoryTest` — DataStore in-memory | Coin persistence and retrieval |
-| `GameRepositoryTest` — Room in-memory DB | Save and query results |
+| `CoinRepositoryTest` — DataStore in-memory       | Coin persistence and retrieval  |
+| `GameRepositoryTest` — Room in-memory DB         | Save and query results          |
 
 **UI Tests** (Compose Testing, Espresso)
 
-| Test | Coverage Target |
-|---|---|
-| `GameScreenTest` — tap cell, enter number | Input response and state update |
-| `CoinShopScreenTest` — product list rendering | Billing state display |
-| `NavigationTest` — Home → Difficulty → Game → Result | Back-stack correctness |
+| Test                                                 | Coverage Target                 |
+|------------------------------------------------------|---------------------------------|
+| `GameScreenTest` — tap cell, enter number            | Input response and state update |
+| `CoinShopScreenTest` — product list rendering        | Billing state display           |
+| `NavigationTest` — Home → Difficulty → Game → Result | Back-stack correctness          |
 
 ---
 
 ## 2.12 Risks and Technical Considerations
 
-| Risk | Severity | Mitigation |
-|---|---|---|
-| Duplicate coin grants from billing retry | High | **Not implemented** — post-MVP: token dedup in DataStore |
-| Lost purchase on process death during flow | High | **Not implemented** — post-MVP: `queryPurchasesAsync` on reconnect |
-| BillingClient disconnects mid-flow | Medium | **Not implemented** — post-MVP: reconnect in `onBillingServiceDisconnected` |
-| Game state lost on process death | Medium | **Not implemented** — post-MVP: `SavedStateHandle` for `GameState` |
-| Input lag on low-end devices (API 24) | Medium | Use `derivedStateOf` and `key()` for grid recomposition |
-| Sudoku generation blocking (9×9 VERY_HARD) | Low | Runs on `Dispatchers.Default` ✓; add timeout if profiling shows issues |
-| No server-side receipt validation | Low (now), High (at scale) | Intentional MVP deferral; document as known debt |
-| ProGuard stripping Billing classes | Medium | Explicit `-keep` rules in `proguard-rules.pro` |
-| `music_enabled` key stored but no music player | Low | Implement background music or remove key |
+| Risk                                           | Severity                   | Mitigation                                                                  |
+|------------------------------------------------|----------------------------|-----------------------------------------------------------------------------|
+| Duplicate coin grants from billing retry       | High                       | **Not implemented** — post-MVP: token dedup in DataStore                    |
+| Lost purchase on process death during flow     | High                       | **Not implemented** — post-MVP: `queryPurchasesAsync` on reconnect          |
+| BillingClient disconnects mid-flow             | Medium                     | **Not implemented** — post-MVP: reconnect in `onBillingServiceDisconnected` |
+| Game state lost on process death               | Medium                     | **Not implemented** — post-MVP: `SavedStateHandle` for `GameState`          |
+| Input lag on low-end devices (API 24)          | Medium                     | Use `derivedStateOf` and `key()` for grid recomposition                     |
+| Sudoku generation blocking (9×9 VERY_HARD)     | Low                        | Runs on `Dispatchers.Default` ✓; add timeout if profiling shows issues      |
+| No server-side receipt validation              | Low (now), High (at scale) | Intentional MVP deferral; document as known debt                            |
+| ProGuard stripping Billing classes             | Medium                     | Explicit `-keep` rules in `proguard-rules.pro`                              |
+| `music_enabled` key stored but no music player | Low                        | Implement background music or remove key                                    |
 
 ---
 
@@ -815,11 +856,17 @@ com.kotonosora.sudoblitz
 
 ### ADR-001: No Dependency Injection Framework (Hilt/Koin)
 
-**Decision:** Manual dependency wiring via `ViewModelProvider.Factory` implementations. No `Application` subclass; dependencies created inline in `MainActivity.onCreate()` and `SudoBlitzApp` composable.
+**Decision:** Manual dependency wiring via `ViewModelProvider.Factory` implementations. No
+`Application` subclass; dependencies created inline in `MainActivity.onCreate()` and `SudoBlitzApp`
+composable.
 
-**Rationale:** Hilt requires plugin configuration and annotation processing that increases build complexity. For an MVP with a contained number of classes, manual factories are sufficient and transparent. Koin was considered but adds a runtime dependency for marginal benefit at this scale.
+**Rationale:** Hilt requires plugin configuration and annotation processing that increases build
+complexity. For an MVP with a contained number of classes, manual factories are sufficient and
+transparent. Koin was considered but adds a runtime dependency for marginal benefit at this scale.
 
-**Consequences:** `UserPreferencesRepository`, `AppDatabase`, and `GameRecordDao` are created in `MainActivity.onCreate()` and passed to all 4 ViewModel factories. Migrating to Hilt post-MVP is straightforward given the constructor-injection pattern.
+**Consequences:** `UserPreferencesRepository`, `AppDatabase`, and `GameRecordDao` are created in
+`MainActivity.onCreate()` and passed to all 4 ViewModel factories. Migrating to Hilt post-MVP is
+straightforward given the constructor-injection pattern.
 
 ---
 
@@ -827,53 +874,64 @@ com.kotonosora.sudoblitz
 
 **Decision:** Use `PreferencesDataStore` for all persistent key-value data.
 
-**Rationale:** `SharedPreferences` has known thread-safety issues on older APIs. `DataStore` provides a coroutine-safe, `Flow`-based API that integrates naturally with the reactive architecture.
+**Rationale:** `SharedPreferences` has known thread-safety issues on older APIs. `DataStore`
+provides a coroutine-safe, `Flow`-based API that integrates naturally with the reactive
+architecture.
 
-**Consequences:** All DataStore reads are asynchronous; there is no synchronous accessor. Callers must collect from `Flow` or use `first()` in a coroutine.
+**Consequences:** All DataStore reads are asynchronous; there is no synchronous accessor. Callers
+must collect from `Flow` or use `first()` in a coroutine.
 
 ---
 
 ### ADR-003: Room for Stats (Optional at MVP)
 
-**Decision:** Room database is included in dependencies. `GameRecord` entity and `GameRecordDao` are fully implemented. `ProgressScreen` (Leaderboard) reads from this database; it will gracefully display an empty state until the first game is completed.
+**Decision:** Room database is included in dependencies. `GameRecord` entity and `GameRecordDao` are
+fully implemented. `ProgressScreen` (Leaderboard) reads from this database; it will gracefully
+display an empty state until the first game is completed.
 
-**Rationale:** Defining the schema now prevents a future migration headache. The table does not block any critical feature.
+**Rationale:** Defining the schema now prevents a future migration headache. The table does not
+block any critical feature.
 
 ---
 
 ## 2.14 Art Style and Visual Design
 
-> Source of truth: `ui/theme/Color.kt`, `ui/theme/Theme.kt`, `ui/theme/Type.kt`, `ui/components/NeonComponents.kt`
+> Source of truth: `ui/theme/Color.kt`, `ui/theme/Theme.kt`, `ui/theme/Type.kt`,
+`ui/components/NeonComponents.kt`
 
 ### Theme Identity: Neon Arcade
 
-SudoBlitz enforces a strict **dark-only** theme. No light mode variant exists. `SudoBlitzTheme` wraps `MaterialTheme` with `darkColorScheme`; `isAppearanceLightStatusBars = false`. Edge-to-edge layout is active (`enableEdgeToEdge()` in `MainActivity`) with transparent status and navigation bars.
+SudoBlitz enforces a strict **dark-only** theme. No light mode variant exists. `SudoBlitzTheme`
+wraps `MaterialTheme` with `darkColorScheme`; `isAppearanceLightStatusBars = false`. Edge-to-edge
+layout is active (`enableEdgeToEdge()` in `MainActivity`) with transparent status and navigation
+bars.
 
 ### Color Tokens
 
-| Token | Hex Value | Primary Usage |
-|---|---|---|
-| `DarkBackground` | `#0A0A12` | Global screen background |
-| `SurfaceDark` | `#1A1A2E` | Cards and elevated surfaces |
-| `GridLineColor` | `#222244` | Sudoku grid cell borders |
-| `NeonCyan` | `#00FFFF` | Primary accent; timer (normal); "SUDO" title; HomeScreen primary |
-| `NeonMagenta` | `#FF00FF` | Secondary accent; "BLITZ" title; SETTINGS/HOME/HARD buttons |
-| `NeonYellow` / `CoinGold` | `#FFEA00` | Coin balance; MEDIUM button; combo badge; score value on Result |
-| `NeonGreen` | `#39FF14` | EASY button; PLAY GAME; VICTORY! title; NEXT LEVEL button |
-| `NeonRed` / `ErrorRed` | `#FF003C` | EXPERT button; GAME OVER title; timer < 10s warning |
-| `NeonBlue` | `#0066FF` | LEADERBOARD button; "Final Score" label on Result |
+| Token                     | Hex Value | Primary Usage                                                    |
+|---------------------------|-----------|------------------------------------------------------------------|
+| `DarkBackground`          | `#0A0A12` | Global screen background                                         |
+| `SurfaceDark`             | `#1A1A2E` | Cards and elevated surfaces                                      |
+| `GridLineColor`           | `#222244` | Sudoku grid cell borders                                         |
+| `NeonCyan`                | `#00FFFF` | Primary accent; timer (normal); "SUDO" title; HomeScreen primary |
+| `NeonMagenta`             | `#FF00FF` | Secondary accent; "BLITZ" title; SETTINGS/HOME/HARD buttons      |
+| `NeonYellow` / `CoinGold` | `#FFEA00` | Coin balance; MEDIUM button; combo badge; score value on Result  |
+| `NeonGreen`               | `#39FF14` | EASY button; PLAY GAME; VICTORY! title; NEXT LEVEL button        |
+| `NeonRed` / `ErrorRed`    | `#FF003C` | EXPERT button; GAME OVER title; timer < 10s warning              |
+| `NeonBlue`                | `#0066FF` | LEADERBOARD button; "Final Score" label on Result                |
 
 ### Typography
 
-Font: **Press Start 2P** (pixel/retro, from `res/font/press_start_2p.ttf`). Applied to **all** `TextStyle` levels in `Typography` (`displayLarge` → `bodySmall`). No system font fallback.
+Font: **Press Start 2P** (pixel/retro, from `res/font/press_start_2p.ttf`). Applied to **all**
+`TextStyle` levels in `Typography` (`displayLarge` → `bodySmall`). No system font fallback.
 
 ### UI Component Specifications
 
-| Component | Shape | Height | Fill | Border | Notes |
-|---|---|---|---|---|---|
-| `NeonButton` | `RoundedCornerShape(50)` (pill) | 64dp | `color.copy(alpha=0.15f)` | 2dp solid neon color | Optional `ImageVector` icon |
-| `NeonTitle` | Text | — | — | Shadow `blurRadius=16f` (glow) | Used for large screen titles |
-| `NeonText` | Text | — | — | No shadow | General text; configurable size, weight, color |
+| Component    | Shape                           | Height | Fill                      | Border                         | Notes                                          |
+|--------------|---------------------------------|--------|---------------------------|--------------------------------|------------------------------------------------|
+| `NeonButton` | `RoundedCornerShape(50)` (pill) | 64dp   | `color.copy(alpha=0.15f)` | 2dp solid neon color           | Optional `ImageVector` icon                    |
+| `NeonTitle`  | Text                            | —      | —                         | Shadow `blurRadius=16f` (glow) | Used for large screen titles                   |
+| `NeonText`   | Text                            | —      | —                         | No shadow                      | General text; configurable size, weight, color |
 
 ---
 
@@ -883,69 +941,76 @@ Font: **Press Start 2P** (pixel/retro, from `res/font/press_start_2p.ttf`). Appl
 
 ### SoundManager
 
-| Property | Value |
-|---|---|
-| Implementation | Android `SoundPool` |
-| Audio usage attribute | `AudioAttributes.USAGE_GAME` |
-| Max concurrent streams | 5 |
-| Sound files | `res/raw/tap.wav`, `res/raw/error.wav`, `res/raw/win.wav`, `res/raw/lose.wav` |
-| Toggle | `sound_enabled` in DataStore; `soundManager.soundEnabled` property |
-| Lifecycle | Created in `MainActivity` via `remember {}`; released in `DisposableEffect` |
-| Provided via | `LocalSoundManager` (`CompositionLocal<SoundManager>`) |
+| Property               | Value                                                                         |
+|------------------------|-------------------------------------------------------------------------------|
+| Implementation         | Android `SoundPool`                                                           |
+| Audio usage attribute  | `AudioAttributes.USAGE_GAME`                                                  |
+| Max concurrent streams | 5                                                                             |
+| Sound files            | `res/raw/tap.wav`, `res/raw/error.wav`, `res/raw/win.wav`, `res/raw/lose.wav` |
+| Toggle                 | `sound_enabled` in DataStore; `soundManager.soundEnabled` property            |
+| Lifecycle              | Created in `MainActivity` via `remember {}`; released in `DisposableEffect`   |
+| Provided via           | `LocalSoundManager` (`CompositionLocal<SoundManager>`)                        |
 
 **Trigger table:**
 
-| Method | Sound | Trigger Condition |
-|---|---|---|
-| `playTap()` | `tap.wav` | Cell tapped, boost button tapped |
-| `playError()` | `error.wav` | Incorrect input (new mistake registered) |
-| `playWin()` | `win.wav` | All cells filled correctly (`isVictory = true`) |
-| `playLose()` | `lose.wav` | Game over (`isGameOver = true`) |
+| Method        | Sound       | Trigger Condition                               |
+|---------------|-------------|-------------------------------------------------|
+| `playTap()`   | `tap.wav`   | Cell tapped, boost button tapped                |
+| `playError()` | `error.wav` | Incorrect input (new mistake registered)        |
+| `playWin()`   | `win.wav`   | All cells filled correctly (`isVictory = true`) |
+| `playLose()`  | `lose.wav`  | Game over (`isGameOver = true`)                 |
 
 ### HapticManager
 
-| Property | Value |
-|---|---|
-| Effect | Single-shot 50ms vibration |
-| API 26+ | `VibrationEffect.createOneShot(50, DEFAULT_AMPLITUDE)` |
-| API 24–25 | Legacy `vibrator.vibrate(50L)` |
-| Toggle | `haptic_enabled` in DataStore |
+| Property     | Value                                                    |
+|--------------|----------------------------------------------------------|
+| Effect       | Single-shot 50ms vibration                               |
+| API 26+      | `VibrationEffect.createOneShot(50, DEFAULT_AMPLITUDE)`   |
+| API 24–25    | Legacy `vibrator.vibrate(50L)`                           |
+| Toggle       | `haptic_enabled` in DataStore                            |
 | Provided via | `LocalHapticManager` (`CompositionLocal<HapticManager>`) |
 
 **Haptic is triggered on:** new mistake + game over (combined with `playError()` / `playLose()`).
 
 ### Background Music
 
-`music_enabled` key exists in DataStore and a UI toggle exists in `SettingsScreen`. **No music player is implemented in the current codebase.** The key is reserved for a future implementation (e.g., `MediaPlayer` or `ExoPlayer` with a looping ambient track).
+`music_enabled` key exists in DataStore and a UI toggle exists in `SettingsScreen`. **No music
+player is implemented in the current codebase.** The key is reserved for a future implementation (
+e.g., `MediaPlayer` or `ExoPlayer` with a looping ambient track).
 
 ---
 
 ### ADR-004: Activity-Scoped BillingClient
 
-**Decision:** `BillingManager` is initialized inside `ShopViewModel` (an `AndroidViewModel`), not in `MainActivity` or `Application`.
+**Decision:** `BillingManager` is initialized inside `ShopViewModel` (an `AndroidViewModel`), not in
+`MainActivity` or `Application`.
 
-**Rationale:** Scoping to `ShopViewModel` ensures the billing client is alive only when the Shop Screen is active and is automatically torn down via `onCleared()`. This avoids background billing activity outside of user intent.
+**Rationale:** Scoping to `ShopViewModel` ensures the billing client is alive only when the Shop
+Screen is active and is automatically torn down via `onCleared()`. This avoids background billing
+activity outside of user intent.
 
-**Consequences:** If the Play Store disconnects while the Shop Screen is open, purchases cannot be retried without the user leaving and re-entering the Shop Screen (reconnect is not yet auto-triggered). This is a known limitation to address post-MVP.
+**Consequences:** If the Play Store disconnects while the Shop Screen is open, purchases cannot be
+retried without the user leaving and re-entering the Shop Screen (reconnect is not yet
+auto-triggered). This is a known limitation to address post-MVP.
 
 ---
 
 # 3. Glossary
 
-| Term | Definition |
-|---|---|
-| **IAP** | In-App Purchase — a user-initiated payment transaction through Google Play |
-| **Consumable product** | An IAP item that can be purchased multiple times; must be consumed via `consumeAsync()` before re-purchase |
-| **Purchase token** | Unique string (`purchaseToken`) returned by Play for each transaction; required for `consumeAsync()` |
-| **Boost** | A coin-funded in-game power-up: Extra Time (20 coins, +30s), Hint (30 coins), Undo (15 coins) |
-| **Combo multiplier** | `GameState.comboMultiplier`; increments on each correct input (max 5×); resets to 1× on any mistake |
-| **Streak** | `GameState.streak`; count of consecutive levels completed via "NEXT LEVEL" without returning to Home |
-| **VERY_HARD** | The `Difficulty` enum value for Expert tier; 9×9 grid, 60 cells removed, 300-second timer |
-| **StateFlow** | A hot Kotlin coroutine flow that always holds and replays its latest emitted value |
-| **SoundPool** | Android API for low-latency playback of short audio clips; used for all 4 game sound effects |
-| **CompositionLocal** | Jetpack Compose mechanism to implicitly pass values down the composition tree; used for `SoundManager` and `HapticManager` |
-| **BillingManager** | App-specific wrapper around `BillingClient`; initialized in `ShopViewModel`; handles product query, purchase flow, and coin grant |
-| **KSP** | Kotlin Symbol Processing — annotation processor for Room entity code generation |
-| **Press Start 2P** | Pixel/retro Google Font used as the exclusive typeface for all text in SudoBlitz |
-| **Neon arcade theme** | Visual identity: `#0A0A12` background, neon color accents, 16f glow shadows, edge-to-edge |
-| **Process death** | Android OS terminating the app process due to memory pressure; in-memory `GameState` is lost |
+| Term                   | Definition                                                                                                                        |
+|------------------------|-----------------------------------------------------------------------------------------------------------------------------------|
+| **IAP**                | In-App Purchase — a user-initiated payment transaction through Google Play                                                        |
+| **Consumable product** | An IAP item that can be purchased multiple times; must be consumed via `consumeAsync()` before re-purchase                        |
+| **Purchase token**     | Unique string (`purchaseToken`) returned by Play for each transaction; required for `consumeAsync()`                              |
+| **Boost**              | A coin-funded in-game power-up: Extra Time (20 coins, +30s), Hint (30 coins), Undo (15 coins)                                     |
+| **Combo multiplier**   | `GameState.comboMultiplier`; increments on each correct input (max 5×); resets to 1× on any mistake                               |
+| **Streak**             | `GameState.streak`; count of consecutive levels completed via "NEXT LEVEL" without returning to Home                              |
+| **VERY_HARD**          | The `Difficulty` enum value for Expert tier; 9×9 grid, 60 cells removed, 300-second timer                                         |
+| **StateFlow**          | A hot Kotlin coroutine flow that always holds and replays its latest emitted value                                                |
+| **SoundPool**          | Android API for low-latency playback of short audio clips; used for all 4 game sound effects                                      |
+| **CompositionLocal**   | Jetpack Compose mechanism to implicitly pass values down the composition tree; used for `SoundManager` and `HapticManager`        |
+| **BillingManager**     | App-specific wrapper around `BillingClient`; initialized in `ShopViewModel`; handles product query, purchase flow, and coin grant |
+| **KSP**                | Kotlin Symbol Processing — annotation processor for Room entity code generation                                                   |
+| **Press Start 2P**     | Pixel/retro Google Font used as the exclusive typeface for all text in SudoBlitz                                                  |
+| **Neon arcade theme**  | Visual identity: `#0A0A12` background, neon color accents, 16f glow shadows, edge-to-edge                                         |
+| **Process death**      | Android OS terminating the app process due to memory pressure; in-memory `GameState` is lost                                      |
