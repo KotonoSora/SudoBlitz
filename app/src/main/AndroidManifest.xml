@@ -15,9 +15,8 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.SudoBlitz">
         <activity
-            android:name="com.graceconsulting.jn.sudoblitz.MainActivity"
+            android:name=".MainActivity"
             android:exported="true"
-            android:label="@string/app_name"
             android:theme="@style/Theme.SudoBlitz">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
