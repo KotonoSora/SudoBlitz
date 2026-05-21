@@ -53,3 +53,7 @@ google-services.json
 # AI
 .agent
 input_images/
+
+.kotlin/
+
+app/release/**/*.dm
