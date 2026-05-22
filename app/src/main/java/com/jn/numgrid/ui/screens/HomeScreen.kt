@@ -52,8 +52,7 @@ fun HomeScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { },
-                actions = {
+                title = { }, actions = {
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
                         modifier = Modifier.padding(end = 16.dp)
@@ -75,11 +74,9 @@ fun HomeScreen(
                             )
                         }
                     }
-                },
-                colors = TopAppBarDefaults.topAppBarColors(containerColor = Color.Transparent)
+                }, colors = TopAppBarDefaults.topAppBarColors(containerColor = Color.Transparent)
             )
-        },
-        containerColor = DarkBackground
+        }, containerColor = DarkBackground
     ) { innerPadding ->
         Column(
             modifier = modifier
@@ -94,10 +91,7 @@ fun HomeScreen(
             Spacer(modifier = Modifier.height(48.dp))
 
             NeonButton(
-                "PLAY GAME",
-                NeonGreen,
-                icon = Icons.Rounded.VideogameAsset,
-                onClick = onPlayClicked
+                "PLAY GAME", NeonGreen, icon = Icons.Rounded.VideogameAsset, onClick = onPlayClicked
             )
             Spacer(modifier = Modifier.height(16.dp))
             NeonButton(
@@ -115,10 +109,7 @@ fun HomeScreen(
             )
             Spacer(modifier = Modifier.height(16.dp))
             NeonButton(
-                "SETTINGS",
-                NeonMagenta,
-                icon = Icons.Rounded.Settings,
-                onClick = onSettingsClicked
+                "SETTINGS", NeonMagenta, icon = Icons.Rounded.Settings, onClick = onSettingsClicked
             )
         }
     }

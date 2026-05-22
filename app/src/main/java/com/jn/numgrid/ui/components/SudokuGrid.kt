@@ -113,8 +113,7 @@ fun SudokuCellView(
                         strokeWidth = if (isThickRight) strokeThick else strokeThin
                     )
                 }
-            }
-    ) {
+            }) {
         if (!cell.isEmpty) {
             val fSize = when (boardSize) {
                 4 -> 32
@@ -122,9 +121,7 @@ fun SudokuCellView(
                 else -> 18 // 9x9 needs slightly smaller text
             }
             NeonText(
-                text = cell.value.toString(),
-                fontSize = fSize,
-                color = textColor
+                text = cell.value.toString(), fontSize = fSize, color = textColor
             )
         }
     }

@@ -97,11 +97,7 @@ object SudokuEngine {
     }
 
     private fun removeCells(
-        grid: Array<IntArray>,
-        size: Int,
-        count: Int,
-        regionRows: Int,
-        regionCols: Int
+        grid: Array<IntArray>, size: Int, count: Int, regionRows: Int, regionCols: Int
     ) {
         var toRemove = count
         val cellIds = (0 until (size * size)).shuffled().toMutableList()
@@ -124,11 +120,7 @@ object SudokuEngine {
     }
 
     private fun countSolutions(
-        grid: Array<IntArray>,
-        size: Int,
-        regionRows: Int,
-        regionCols: Int,
-        count: Int
+        grid: Array<IntArray>, size: Int, regionRows: Int, regionCols: Int, count: Int
     ): Int {
         var solutionCount = count
         for (row in 0 until size) {

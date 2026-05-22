@@ -46,8 +46,6 @@ fun SudoBlitzTheme(content: @Composable () -> Unit) {
     }
 
     MaterialTheme(
-        colorScheme = ArcadeColorScheme,
-        typography = Typography,
-        content = content
+        colorScheme = ArcadeColorScheme, typography = Typography, content = content
     )
 }

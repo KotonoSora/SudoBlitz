@@ -11,14 +11,23 @@ import kotlinx.coroutines.launch
 
 class SettingsViewModel(private val repository: UserPreferencesRepository) : ViewModel() {
 
-    val soundEnabled: StateFlow<Boolean> = repository.soundEnabledFlow
-        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), true)
+    val soundEnabled: StateFlow<Boolean> = repository.soundEnabledFlow.stateIn(
+            viewModelScope,
+            SharingStarted.WhileSubscribed(5000),
+            true
+        )
 
-    val musicEnabled: StateFlow<Boolean> = repository.musicEnabledFlow
-        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), true)
+    val musicEnabled: StateFlow<Boolean> = repository.musicEnabledFlow.stateIn(
+            viewModelScope,
+            SharingStarted.WhileSubscribed(5000),
+            true
+        )
 
-    val hapticEnabled: StateFlow<Boolean> = repository.hapticEnabledFlow
-        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), true)
+    val hapticEnabled: StateFlow<Boolean> = repository.hapticEnabledFlow.stateIn(
+            viewModelScope,
+            SharingStarted.WhileSubscribed(5000),
+            true
+        )
 
     fun toggleSound(enabled: Boolean) {
         viewModelScope.launch {
