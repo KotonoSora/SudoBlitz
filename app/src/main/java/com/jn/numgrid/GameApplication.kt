@@ -27,7 +27,7 @@ import com.jn.numgrid.viewmodel.SettingsViewModel
 import com.jn.numgrid.viewmodel.ShopViewModel
 
 @Composable
-fun GameApp(
+fun GameApplication(
     repository: UserPreferencesRepository,
     gameRecordDao: GameRecordDao,
     application: Application,
