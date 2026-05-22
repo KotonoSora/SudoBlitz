@@ -14,21 +14,23 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.stateIn
 
 class ShopViewModel(
-    application: Application, preferencesRepository: UserPreferencesRepository
+    application: Application,
+    preferencesRepository: UserPreferencesRepository,
+    isPreview: Boolean = false
 ) : AndroidViewModel(application) {
 
-    private val billingManager = BillingManager(application, preferencesRepository)
+    private val billingManager = BillingManager(application, preferencesRepository, isPreview)
 
-    val products: StateFlow<List<StoreProduct>> = billingManager.products.stateIn(
-            viewModelScope,
-            SharingStarted.WhileSubscribed(5000),
-            emptyList()
-        )
+    fun setMockProducts(products: List<StoreProduct>) {
+        billingManager.setMockProducts(products)
+    }
+
+    val products: StateFlow<List<StoreProduct>> = billingManager.products
 
     val coins: StateFlow<Int> = preferencesRepository.coinsFlow.stateIn(
             viewModelScope,
-            SharingStarted.WhileSubscribed(5000),
-            0
+            SharingStarted.Eagerly,
+            500
         )
 
     fun buyProduct(activity: Activity, product: StoreProduct) {

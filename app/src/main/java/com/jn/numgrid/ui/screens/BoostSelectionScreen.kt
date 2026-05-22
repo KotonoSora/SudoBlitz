@@ -29,6 +29,8 @@ import com.jn.numgrid.ui.theme.NeonGreen
 import com.jn.numgrid.ui.theme.NeonMagenta
 import com.jn.numgrid.ui.theme.NeonRed
 import com.jn.numgrid.ui.theme.NeonYellow
+import androidx.compose.ui.tooling.preview.Preview
+import com.jn.numgrid.ui.theme.GameTheme
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -95,5 +97,17 @@ fun BoostSelectionScreen(
                     onStartGame(9, Difficulty.VERY_HARD)
                 })
         }
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun BoostSelectionScreenPreview() {
+    GameTheme {
+        BoostSelectionScreen(
+            soundManager = rememberPreviewSoundManager(),
+            onBack = {},
+            onStartGame = { _, _ -> }
+        )
     }
 }

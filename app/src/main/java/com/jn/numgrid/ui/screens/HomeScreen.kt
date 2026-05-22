@@ -1,5 +1,6 @@
 package com.jn.numgrid.ui.screens
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -26,12 +27,15 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.jn.numgrid.R
 import com.jn.numgrid.ui.components.NeonButton
 import com.jn.numgrid.ui.components.NeonText
 import com.jn.numgrid.ui.components.NeonTitle
 import com.jn.numgrid.ui.theme.CoinGold
 import com.jn.numgrid.ui.theme.DarkBackground
+import com.jn.numgrid.ui.theme.GameTheme
 import com.jn.numgrid.ui.theme.NeonBlue
 import com.jn.numgrid.ui.theme.NeonCyan
 import com.jn.numgrid.ui.theme.NeonGreen
@@ -49,32 +53,34 @@ fun HomeScreen(
     onShopClicked: () -> Unit,
     modifier: Modifier = Modifier
 ) {
+    BackHandler(enabled = true) {}
+
     Scaffold(
         topBar = {
             TopAppBar(
                 title = { }, actions = {
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        modifier = Modifier.padding(end = 16.dp)
-                    ) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.padding(end = 16.dp)
+                ) {
+                    Icon(
+                        Icons.Rounded.MonetizationOn,
+                        contentDescription = "Coins",
+                        tint = CoinGold,
+                        modifier = Modifier.size(24.dp)
+                    )
+                    Spacer(modifier = Modifier.width(4.dp))
+                    NeonText(coins.toString(), CoinGold, fontSize = 18)
+                    Spacer(modifier = Modifier.width(16.dp))
+                    IconButton(onClick = onShopClicked) {
                         Icon(
-                            Icons.Rounded.MonetizationOn,
-                            contentDescription = "Coins",
-                            tint = CoinGold,
-                            modifier = Modifier.size(24.dp)
+                            Icons.Rounded.ShoppingCart,
+                            contentDescription = "Shop",
+                            tint = NeonCyan
                         )
-                        Spacer(modifier = Modifier.width(4.dp))
-                        NeonText(coins.toString(), CoinGold, fontSize = 18)
-                        Spacer(modifier = Modifier.width(16.dp))
-                        IconButton(onClick = onShopClicked) {
-                            Icon(
-                                Icons.Rounded.ShoppingCart,
-                                contentDescription = "Shop",
-                                tint = NeonCyan
-                            )
-                        }
                     }
-                }, colors = TopAppBarDefaults.topAppBarColors(containerColor = Color.Transparent)
+                }
+            }, colors = TopAppBarDefaults.topAppBarColors(containerColor = Color.Transparent)
             )
         }, containerColor = DarkBackground
     ) { innerPadding ->
@@ -86,8 +92,7 @@ fun HomeScreen(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
-            NeonTitle("SUDO", NeonCyan)
-            NeonTitle("BLITZ", NeonMagenta)
+            NeonTitle(R.string.app_name, NeonCyan)
             Spacer(modifier = Modifier.height(48.dp))
 
             NeonButton(
@@ -112,5 +117,19 @@ fun HomeScreen(
                 "SETTINGS", NeonMagenta, icon = Icons.Rounded.Settings, onClick = onSettingsClicked
             )
         }
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun HomeScreenPreview() {
+    GameTheme {
+        HomeScreen(
+            coins = 120,
+            onPlayClicked = {},
+            onDailyChallengeClicked = {},
+            onLeaderboardClicked = {},
+            onSettingsClicked = {},
+            onShopClicked = {})
     }
 }

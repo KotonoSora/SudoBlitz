@@ -26,6 +26,8 @@ import com.jn.numgrid.ui.components.NeonText
 import com.jn.numgrid.ui.components.NeonTitle
 import com.jn.numgrid.ui.theme.DarkBackground
 import com.jn.numgrid.ui.theme.NeonYellow
+import androidx.compose.ui.tooling.preview.Preview
+import com.jn.numgrid.ui.theme.GameTheme
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -74,5 +76,17 @@ fun DailyChallengeScreen(
                 onStartChallenge(6, Difficulty.MEDIUM)
             })
         }
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun DailyChallengeScreenPreview() {
+    GameTheme {
+        DailyChallengeScreen(
+            soundManager = rememberPreviewSoundManager(),
+            onBack = {},
+            onStartChallenge = { _, _ -> }
+        )
     }
 }

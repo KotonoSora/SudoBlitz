@@ -59,6 +59,19 @@ fun GameApplication(
     val coins by gameViewModel.coins.collectAsState()
     val gameState by gameViewModel.gameState.collectAsState()
 
+    val navigateHomeAsRoot: () -> Unit = {
+        navController.navigate(Screen.Home.route) {
+            popUpTo(navController.graph.startDestinationId) { inclusive = false }
+            launchSingleTop = true
+        }
+    }
+
+    val navigateBackSafely: () -> Unit = {
+        if (!navController.popBackStack(Screen.Home.route, inclusive = false)) {
+            navigateHomeAsRoot()
+        }
+    }
+
     NavHost(navController = navController, startDestination = Screen.Home.route) {
         composable(Screen.Home.route) {
             HomeScreen(coins = coins, onPlayClicked = {
@@ -81,8 +94,7 @@ fun GameApplication(
 
         composable(Screen.BoostSelection.route) {
             BoostSelectionScreen(soundManager = soundManager, onBack = {
-                soundManager.playTap()
-                navController.popBackStack()
+                navigateBackSafely()
             }, onStartGame = { size, difficulty ->
                 soundManager.playTap()
                 gameViewModel.startNewGame(size, difficulty)
@@ -93,15 +105,13 @@ fun GameApplication(
         composable(Screen.Progress.route) {
             ProgressScreen(
                 viewModel = progressViewModel, onBack = {
-                    soundManager.playTap()
-                    navController.popBackStack()
+                    navigateBackSafely()
                 })
         }
 
         composable(Screen.DailyChallenge.route) {
             DailyChallengeScreen(soundManager = soundManager, onBack = {
-                soundManager.playTap()
-                navController.popBackStack()
+                navigateBackSafely()
             }, onStartChallenge = { size, difficulty ->
                 gameViewModel.startNewGame(size, difficulty)
                 navController.navigate(Screen.Game.route)
@@ -111,8 +121,7 @@ fun GameApplication(
         composable(Screen.Settings.route) {
             SettingsScreen(
                 viewModel = settingsViewModel, onBack = {
-                    soundManager.playTap()
-                    navController.popBackStack()
+                    navigateBackSafely()
                 })
         }
 
@@ -143,17 +152,14 @@ fun GameApplication(
                 }
             }, onHome = {
                 soundManager.playTap()
-                navController.navigate(Screen.Home.route) {
-                    popUpTo(Screen.Home.route) { inclusive = true }
-                }
+                navigateHomeAsRoot()
             })
         }
 
         composable(Screen.Shop.route) {
             ShopScreen(
                 viewModel = shopViewModel, onBack = {
-                    soundManager.playTap()
-                    navController.popBackStack()
+                    navigateBackSafely()
                 })
         }
     }

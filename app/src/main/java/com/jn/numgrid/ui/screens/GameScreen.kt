@@ -1,5 +1,6 @@
 package com.jn.numgrid.ui.screens
 
+import android.annotation.SuppressLint
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -43,11 +44,14 @@ import com.jn.numgrid.ui.components.NeonText
 import com.jn.numgrid.ui.components.Numpad
 import com.jn.numgrid.ui.components.SudokuGrid
 import com.jn.numgrid.ui.theme.ErrorRed
+import androidx.compose.ui.tooling.preview.Preview
+import com.jn.numgrid.ui.theme.GameTheme
 import com.jn.numgrid.ui.theme.NeonCyan
 import com.jn.numgrid.ui.theme.NeonYellow
 import com.jn.numgrid.viewmodel.GameState
 import com.jn.numgrid.viewmodel.GameViewModel
 import java.util.Locale
+import androidx.compose.ui.platform.LocalLocale
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -172,6 +176,7 @@ fun GameScreen(
     }
 }
 
+@SuppressLint("NonObservableLocale")
 @Composable
 fun GameStatsHeader(gameState: GameState, modifier: Modifier = Modifier) {
     Row(
@@ -181,7 +186,7 @@ fun GameStatsHeader(gameState: GameState, modifier: Modifier = Modifier) {
     ) {
         val minutes = gameState.timeRemaining / 60
         val seconds = gameState.timeRemaining % 60
-        val locale = LocalConfiguration.current.locales[0] ?: Locale.getDefault()
+        val locale = LocalConfiguration.current.locales[0] ?: LocalLocale.current.platformLocale
         val timeStr = String.format(locale, "%02d:%02d", minutes, seconds)
 
         // Timer Section
@@ -249,5 +254,18 @@ fun BoostButton(
             Spacer(modifier = Modifier.height(4.dp))
             NeonText(text = "$cost Coins", color = NeonYellow, fontSize = 10)
         }
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun GameScreenPreview() {
+    GameTheme {
+        GameScreen(
+            viewModel = rememberPreviewGameViewModel(),
+            soundManager = rememberPreviewSoundManager(),
+            hapticManager = rememberPreviewHapticManager(),
+            onNavigateToResult = {}
+        )
     }
 }

@@ -37,11 +37,14 @@ import com.jn.numgrid.ui.theme.NeonCyan
 import com.jn.numgrid.ui.theme.NeonMagenta
 import com.jn.numgrid.ui.theme.NeonYellow
 import com.jn.numgrid.ui.theme.SurfaceDark
+import androidx.compose.ui.tooling.preview.Preview
+import com.jn.numgrid.ui.theme.GameTheme
 import com.jn.numgrid.viewmodel.ProgressViewModel
 import java.text.NumberFormat
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
+import androidx.compose.ui.platform.LocalLocale
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -145,7 +148,7 @@ fun ProgressScreen(
 
 @Composable
 fun HistoryRow(record: GameRecord) {
-    val dateFormat = SimpleDateFormat("MMM dd, HH:mm", Locale.getDefault())
+    val dateFormat = SimpleDateFormat("MMM dd, HH:mm", LocalLocale.current.platformLocale)
     val dateStr = dateFormat.format(Date(record.timestamp))
     val numberFormat = NumberFormat.getNumberInstance(Locale.US)
 
@@ -163,6 +166,17 @@ fun HistoryRow(record: GameRecord) {
             NeonMagenta,
             fontSize = 14,
             modifier = Modifier.weight(1f)
+        )
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun ProgressScreenPreview() {
+    GameTheme {
+        ProgressScreen(
+            viewModel = rememberPreviewProgressViewModel(),
+            onBack = {}
         )
     }
 }

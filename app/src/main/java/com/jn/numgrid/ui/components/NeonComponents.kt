@@ -21,9 +21,11 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shadow
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.jn.numgrid.ui.theme.PressStart2P
@@ -36,7 +38,8 @@ fun NeonButton(
     color: Color,
     modifier: Modifier = Modifier,
     icon: ImageVector? = null,
-    onClick: () -> Unit
+    onClick: () -> Unit,
+    textSize: TextUnit = 16.sp,
 ) {
     val shape = RoundedCornerShape(50)
     Row(
@@ -49,7 +52,8 @@ fun NeonButton(
             .clickable { onClick() }
             .padding(horizontal = 24.dp),
         verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.Start) {
+        horizontalArrangement = Arrangement.Center,
+    ) {
         if (icon != null) {
             Icon(
                 imageVector = icon,
@@ -62,11 +66,24 @@ fun NeonButton(
         Text(
             text = text,
             color = color,
-            fontSize = 18.sp,
+            fontSize = textSize,
             fontWeight = FontWeight.Bold,
-            fontFamily = RetroFont
+            fontFamily = RetroFont,
+            textAlign = TextAlign.Center,
         )
     }
+}
+
+@Composable
+fun NeonTitle(
+    resId: Int, color: Color, modifier: Modifier = Modifier, fontSize: Int = 48
+) {
+    NeonTitle(
+        text = stringResource(id = resId),
+        color = color,
+        modifier = modifier,
+        fontSize = fontSize
+    )
 }
 
 @Composable

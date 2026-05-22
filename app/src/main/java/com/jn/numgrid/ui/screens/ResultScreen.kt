@@ -28,6 +28,9 @@ import com.jn.numgrid.ui.theme.NeonBlue
 import com.jn.numgrid.ui.theme.NeonCyan
 import com.jn.numgrid.ui.theme.NeonGreen
 import com.jn.numgrid.ui.theme.NeonMagenta
+import androidx.compose.ui.tooling.preview.Preview
+import com.jn.numgrid.ui.theme.GameTheme
+import com.jn.numgrid.model.Difficulty
 import com.jn.numgrid.ui.theme.NeonYellow
 import com.jn.numgrid.ui.theme.SuccessGreen
 import com.jn.numgrid.ui.theme.SurfaceDark
@@ -95,6 +98,40 @@ fun ResultScreen(
 
         NeonButton(
             text = "HOME", color = NeonMagenta, icon = Icons.Rounded.Home, onClick = onHome
+        )
+    }
+}
+
+@Preview(name = "Victory", showBackground = true)
+@Composable
+fun ResultScreenVictoryPreview() {
+    GameTheme {
+        ResultScreen(
+            gameState = GameState(
+                score = 2450,
+                streak = 3,
+                isVictory = true,
+                isGameOver = true
+            ),
+            onPlayAgain = {},
+            onHome = {}
+        )
+    }
+}
+
+@Preview(name = "Defeat", showBackground = true)
+@Composable
+fun ResultScreenDefeatPreview() {
+    GameTheme {
+        ResultScreen(
+            gameState = GameState(
+                score = 800,
+                streak = 0,
+                isVictory = false,
+                isGameOver = true
+            ),
+            onPlayAgain = {},
+            onHome = {}
         )
     }
 }
