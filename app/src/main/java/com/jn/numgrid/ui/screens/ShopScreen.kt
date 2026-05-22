@@ -57,9 +57,7 @@ import com.jn.numgrid.viewmodel.ShopViewModel
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ShopScreen(
-    viewModel: ShopViewModel,
-    onBack: () -> Unit,
-    modifier: Modifier = Modifier
+    viewModel: ShopViewModel, onBack: () -> Unit, modifier: Modifier = Modifier
 ) {
     val products by viewModel.products.collectAsState()
     val coins by viewModel.coins.collectAsState()
@@ -68,45 +66,38 @@ fun ShopScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { NeonText("Coin Shop", NeonCyan, fontSize = 24) },
-                navigationIcon = {
-                    IconButton(onClick = onBack) {
-                        Icon(
-                            Icons.AutoMirrored.Rounded.ArrowBack,
-                            contentDescription = "Back",
-                            tint = NeonCyan
-                        )
-                    }
-                },
-                actions = {
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        modifier = Modifier.padding(end = 16.dp)
-                    ) {
-                        Icon(
-                            imageVector = Icons.Rounded.MonetizationOn,
-                            contentDescription = "Coins",
-                            tint = CoinGold,
-                            modifier = Modifier.size(24.dp)
-                        )
-                        Spacer(modifier = Modifier.width(4.dp))
-                        NeonText(
-                            text = coins.toString(),
-                            color = CoinGold,
-                            fontSize = 18
-                        )
-                    }
-                },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = DarkBackground,
-                    titleContentColor = NeonCyan,
-                    navigationIconContentColor = NeonCyan,
-                    actionIconContentColor = NeonCyan
-                )
+                title = { NeonText("Coin Shop", NeonCyan, fontSize = 24) }, navigationIcon = {
+                IconButton(onClick = onBack) {
+                    Icon(
+                        Icons.AutoMirrored.Rounded.ArrowBack,
+                        contentDescription = "Back",
+                        tint = NeonCyan
+                    )
+                }
+            }, actions = {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.padding(end = 16.dp)
+                ) {
+                    Icon(
+                        imageVector = Icons.Rounded.MonetizationOn,
+                        contentDescription = "Coins",
+                        tint = CoinGold,
+                        modifier = Modifier.size(24.dp)
+                    )
+                    Spacer(modifier = Modifier.width(4.dp))
+                    NeonText(
+                        text = coins.toString(), color = CoinGold, fontSize = 18
+                    )
+                }
+            }, colors = TopAppBarDefaults.topAppBarColors(
+                containerColor = DarkBackground,
+                titleContentColor = NeonCyan,
+                navigationIconContentColor = NeonCyan,
+                actionIconContentColor = NeonCyan
             )
-        },
-        modifier = modifier.fillMaxSize(),
-        containerColor = DarkBackground
+            )
+        }, modifier = modifier.fillMaxSize(), containerColor = DarkBackground
     ) { innerPadding ->
         Column(
             modifier = Modifier
@@ -134,8 +125,7 @@ fun ShopScreen(
                     items(products) { product ->
                         ProductItem(
                             product = product,
-                            onPurchaseClick = { viewModel.buyProduct(activity, product) }
-                        )
+                            onPurchaseClick = { viewModel.buyProduct(activity, product) })
                     }
                 }
             }
@@ -145,9 +135,7 @@ fun ShopScreen(
 
 @Composable
 fun ProductItem(
-    product: StoreProduct,
-    onPurchaseClick: () -> Unit,
-    modifier: Modifier = Modifier
+    product: StoreProduct, onPurchaseClick: () -> Unit, modifier: Modifier = Modifier
 ) {
     val price = product.price
 
@@ -195,9 +183,7 @@ fun ProductItem(
             Spacer(modifier = Modifier.height(12.dp))
 
             NeonText(
-                text = "$coinsAmount",
-                color = CoinGold,
-                fontSize = 14
+                text = "$coinsAmount", color = CoinGold, fontSize = 14
             )
 
             Spacer(modifier = Modifier.height(4.dp))
@@ -214,8 +200,7 @@ fun ProductItem(
                 onClick = onPurchaseClick,
                 shape = RoundedCornerShape(12.dp),
                 colors = ButtonDefaults.buttonColors(
-                    containerColor = NeonMagenta,
-                    contentColor = DarkBackground
+                    containerColor = NeonMagenta, contentColor = DarkBackground
                 ),
                 modifier = Modifier.fillMaxWidth(),
                 contentPadding = PaddingValues(horizontal = 4.dp, vertical = 8.dp)

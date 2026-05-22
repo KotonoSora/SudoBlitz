@@ -46,9 +46,7 @@ import java.util.Locale
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ProgressScreen(
-    viewModel: ProgressViewModel,
-    onBack: () -> Unit,
-    modifier: Modifier = Modifier
+    viewModel: ProgressViewModel, onBack: () -> Unit, modifier: Modifier = Modifier
 ) {
     val highScore by viewModel.highScore.collectAsState()
     val bestStreak by viewModel.bestStreak.collectAsState()
@@ -59,20 +57,17 @@ fun ProgressScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { },
-                navigationIcon = {
-                    IconButton(onClick = onBack) {
-                        Icon(
-                            Icons.AutoMirrored.Rounded.ArrowBack,
-                            contentDescription = "Back",
-                            tint = NeonBlue
-                        )
-                    }
-                },
-                colors = TopAppBarDefaults.topAppBarColors(containerColor = Color.Transparent)
+                title = { }, navigationIcon = {
+                IconButton(onClick = onBack) {
+                    Icon(
+                        Icons.AutoMirrored.Rounded.ArrowBack,
+                        contentDescription = "Back",
+                        tint = NeonBlue
+                    )
+                }
+            }, colors = TopAppBarDefaults.topAppBarColors(containerColor = Color.Transparent)
             )
-        },
-        containerColor = DarkBackground
+        }, containerColor = DarkBackground
     ) { innerPadding ->
         Column(
             modifier = modifier
@@ -114,10 +109,7 @@ fun ProgressScreen(
             }
 
             NeonText(
-                "RECENT GAMES",
-                NeonBlue,
-                fontSize = 18,
-                modifier = Modifier.padding(bottom = 8.dp)
+                "RECENT GAMES", NeonBlue, fontSize = 18, modifier = Modifier.padding(bottom = 8.dp)
             )
 
             // Game History Section
@@ -137,8 +129,7 @@ fun ProgressScreen(
                         NeonText("SCORE", NeonBlue, fontSize = 12, modifier = Modifier.weight(1f))
                     }
                     HorizontalDivider(
-                        color = NeonBlue,
-                        modifier = Modifier.padding(vertical = 8.dp)
+                        color = NeonBlue, modifier = Modifier.padding(vertical = 8.dp)
                     )
 
                     LazyColumn {

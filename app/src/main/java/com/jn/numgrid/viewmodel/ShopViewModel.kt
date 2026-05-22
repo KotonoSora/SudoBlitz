@@ -14,17 +14,22 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.stateIn
 
 class ShopViewModel(
-    application: Application,
-    preferencesRepository: UserPreferencesRepository
+    application: Application, preferencesRepository: UserPreferencesRepository
 ) : AndroidViewModel(application) {
 
     private val billingManager = BillingManager(application, preferencesRepository)
 
-    val products: StateFlow<List<StoreProduct>> = billingManager.products
-        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
+    val products: StateFlow<List<StoreProduct>> = billingManager.products.stateIn(
+            viewModelScope,
+            SharingStarted.WhileSubscribed(5000),
+            emptyList()
+        )
 
-    val coins: StateFlow<Int> = preferencesRepository.coinsFlow
-        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), 0)
+    val coins: StateFlow<Int> = preferencesRepository.coinsFlow.stateIn(
+            viewModelScope,
+            SharingStarted.WhileSubscribed(5000),
+            0
+        )
 
     fun buyProduct(activity: Activity, product: StoreProduct) {
         billingManager.launchBillingFlow(activity, product)
@@ -37,17 +42,15 @@ class ShopViewModel(
 
     companion object {
         fun provideFactory(
-            application: Application,
-            repository: UserPreferencesRepository
-        ): ViewModelProvider.Factory =
-            object : ViewModelProvider.Factory {
-                @Suppress("UNCHECKED_CAST")
-                override fun <T : ViewModel> create(modelClass: Class<T>): T {
-                    if (modelClass.isAssignableFrom(ShopViewModel::class.java)) {
-                        return ShopViewModel(application, repository) as T
-                    }
-                    throw IllegalArgumentException("Unknown ViewModel class")
+            application: Application, repository: UserPreferencesRepository
+        ): ViewModelProvider.Factory = object : ViewModelProvider.Factory {
+            @Suppress("UNCHECKED_CAST")
+            override fun <T : ViewModel> create(modelClass: Class<T>): T {
+                if (modelClass.isAssignableFrom(ShopViewModel::class.java)) {
+                    return ShopViewModel(application, repository) as T
                 }
+                throw IllegalArgumentException("Unknown ViewModel class")
             }
+        }
     }
 }

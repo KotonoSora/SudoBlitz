@@ -19,7 +19,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import com.jn.numgrid.LocalSoundManager
+import com.jn.numgrid.audio.SoundManager
 import com.jn.numgrid.model.Difficulty
 import com.jn.numgrid.ui.components.NeonButton
 import com.jn.numgrid.ui.components.NeonText
@@ -30,17 +30,16 @@ import com.jn.numgrid.ui.theme.NeonYellow
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DailyChallengeScreen(
+    soundManager: SoundManager,
     onBack: () -> Unit,
     onStartChallenge: (Int, Difficulty) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val soundManager = LocalSoundManager.current
 
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { },
-                navigationIcon = {
+                title = { }, navigationIcon = {
                     IconButton(onClick = {
                         soundManager.playTap()
                         onBack()
@@ -51,11 +50,9 @@ fun DailyChallengeScreen(
                             tint = NeonYellow
                         )
                     }
-                },
-                colors = TopAppBarDefaults.topAppBarColors(containerColor = Color.Transparent)
+                }, colors = TopAppBarDefaults.topAppBarColors(containerColor = Color.Transparent)
             )
-        },
-        containerColor = DarkBackground
+        }, containerColor = DarkBackground
     ) { innerPadding ->
         Column(
             modifier = modifier
@@ -68,9 +65,7 @@ fun DailyChallengeScreen(
             NeonTitle("DAILY CHALLENGE", NeonYellow, fontSize = 32)
             Spacer(modifier = Modifier.height(24.dp))
             NeonText(
-                "Beat the clock with today's special 6x6 grid!",
-                Color.White,
-                fontSize = 16
+                "Beat the clock with today's special 6x6 grid!", Color.White, fontSize = 16
             )
             Spacer(modifier = Modifier.height(48.dp))
             NeonButton("START CHALLENGE", NeonYellow, onClick = {

@@ -34,9 +34,7 @@ import com.jn.numgrid.viewmodel.SettingsViewModel
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SettingsScreen(
-    viewModel: SettingsViewModel,
-    onBack: () -> Unit,
-    modifier: Modifier = Modifier
+    viewModel: SettingsViewModel, onBack: () -> Unit, modifier: Modifier = Modifier
 ) {
     val soundEnabled by viewModel.soundEnabled.collectAsState()
     val musicEnabled by viewModel.musicEnabled.collectAsState()
@@ -45,20 +43,17 @@ fun SettingsScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { },
-                navigationIcon = {
-                    IconButton(onClick = onBack) {
-                        Icon(
-                            Icons.AutoMirrored.Rounded.ArrowBack,
-                            contentDescription = "Back",
-                            tint = NeonMagenta
-                        )
-                    }
-                },
-                colors = TopAppBarDefaults.topAppBarColors(containerColor = Color.Transparent)
+                title = { }, navigationIcon = {
+                IconButton(onClick = onBack) {
+                    Icon(
+                        Icons.AutoMirrored.Rounded.ArrowBack,
+                        contentDescription = "Back",
+                        tint = NeonMagenta
+                    )
+                }
+            }, colors = TopAppBarDefaults.topAppBarColors(containerColor = Color.Transparent)
             )
-        },
-        containerColor = DarkBackground
+        }, containerColor = DarkBackground
     ) { innerPadding ->
         Column(
             modifier = modifier
@@ -74,32 +69,26 @@ fun SettingsScreen(
                 label = "Sound Effects",
                 color = NeonMagenta,
                 checked = soundEnabled,
-                onCheckedChange = { viewModel.toggleSound(it) }
-            )
+                onCheckedChange = { viewModel.toggleSound(it) })
             Spacer(modifier = Modifier.height(16.dp))
             SettingToggle(
                 label = "Background Music",
                 color = NeonMagenta,
                 checked = musicEnabled,
-                onCheckedChange = { viewModel.toggleMusic(it) }
-            )
+                onCheckedChange = { viewModel.toggleMusic(it) })
             Spacer(modifier = Modifier.height(16.dp))
             SettingToggle(
                 label = "Haptic Feedback",
                 color = NeonMagenta,
                 checked = hapticEnabled,
-                onCheckedChange = { viewModel.toggleHaptic(it) }
-            )
+                onCheckedChange = { viewModel.toggleHaptic(it) })
         }
     }
 }
 
 @Composable
 fun SettingToggle(
-    label: String,
-    color: Color,
-    checked: Boolean,
-    onCheckedChange: (Boolean) -> Unit
+    label: String, color: Color, checked: Boolean, onCheckedChange: (Boolean) -> Unit
 ) {
     Row(
         modifier = Modifier
@@ -110,11 +99,8 @@ fun SettingToggle(
     ) {
         NeonText(label, color, fontSize = 18)
         Switch(
-            checked = checked,
-            onCheckedChange = onCheckedChange,
-            colors = SwitchDefaults.colors(
-                checkedThumbColor = color,
-                checkedTrackColor = color.copy(alpha = 0.3f)
+            checked = checked, onCheckedChange = onCheckedChange, colors = SwitchDefaults.colors(
+                checkedThumbColor = color, checkedTrackColor = color.copy(alpha = 0.3f)
             )
         )
     }

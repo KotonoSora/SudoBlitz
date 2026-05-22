@@ -23,18 +23,14 @@ import com.jn.numgrid.ui.theme.SurfaceDark
 
 @Composable
 fun Numpad(
-    size: Int,
-    onNumberSelected: (Int) -> Unit,
-    modifier: Modifier = Modifier
+    size: Int, onNumberSelected: (Int) -> Unit, modifier: Modifier = Modifier
 ) {
     if (size > 6) {
         Column(
-            modifier = modifier.fillMaxWidth(),
-            verticalArrangement = Arrangement.spacedBy(8.dp)
+            modifier = modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceEvenly
+                modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceEvenly
             ) {
                 for (i in 1..5) {
                     NumpadButton(
@@ -45,8 +41,7 @@ fun Numpad(
                 }
             }
             Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceEvenly
+                modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceEvenly
             ) {
                 for (i in 6..size) {
                     NumpadButton(
@@ -67,14 +62,11 @@ fun Numpad(
         }
     } else {
         Row(
-            modifier = modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceEvenly
+            modifier = modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceEvenly
         ) {
             for (i in 1..size) {
                 NumpadButton(
-                    number = i,
-                    onNumberSelected = onNumberSelected,
-                    modifier = Modifier.weight(1f)
+                    number = i, onNumberSelected = onNumberSelected, modifier = Modifier.weight(1f)
                 )
             }
         }
@@ -83,9 +75,7 @@ fun Numpad(
 
 @Composable
 fun NumpadButton(
-    number: Int,
-    onNumberSelected: (Int) -> Unit,
-    modifier: Modifier = Modifier
+    number: Int, onNumberSelected: (Int) -> Unit, modifier: Modifier = Modifier
 ) {
     val shape = RoundedCornerShape(12.dp)
     Button(
@@ -93,8 +83,7 @@ fun NumpadButton(
         shape = shape,
         contentPadding = PaddingValues(0.dp),
         colors = ButtonDefaults.buttonColors(
-            containerColor = SurfaceDark,
-            contentColor = NeonCyan
+            containerColor = SurfaceDark, contentColor = NeonCyan
         ),
         modifier = modifier
             .aspectRatio(0.8f)
@@ -102,13 +91,10 @@ fun NumpadButton(
             .border(2.dp, NeonCyan.copy(alpha = 0.5f), shape)
     ) {
         Box(
-            modifier = Modifier.fillMaxSize(),
-            contentAlignment = Alignment.Center
+            modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center
         ) {
             NeonText(
-                text = number.toString(),
-                color = NeonCyan,
-                fontSize = 28
+                text = number.toString(), color = NeonCyan, fontSize = 28
             )
         }
     }

@@ -20,15 +20,10 @@ class SoundManager(context: Context, private val repository: UserPreferencesRepo
     private val scope = CoroutineScope(Dispatchers.IO)
 
     init {
-        val audioAttributes = AudioAttributes.Builder()
-            .setUsage(AudioAttributes.USAGE_GAME)
-            .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
-            .build()
+        val audioAttributes = AudioAttributes.Builder().setUsage(AudioAttributes.USAGE_GAME)
+            .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION).build()
 
-        soundPool = SoundPool.Builder()
-            .setMaxStreams(5)
-            .setAudioAttributes(audioAttributes)
-            .build()
+        soundPool = SoundPool.Builder().setMaxStreams(5).setAudioAttributes(audioAttributes).build()
 
         tapSoundId = soundPool.load(context, R.raw.tap, 1)
         errorSoundId = soundPool.load(context, R.raw.error, 1)

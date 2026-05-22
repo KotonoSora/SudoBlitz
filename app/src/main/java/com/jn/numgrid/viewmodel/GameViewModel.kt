@@ -44,14 +44,23 @@ class GameViewModel(
     private val _gameState = MutableStateFlow(GameState())
     val gameState: StateFlow<GameState> = _gameState.asStateFlow()
 
-    val coins: StateFlow<Int> = preferencesRepository.coinsFlow
-        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), 0)
+    val coins: StateFlow<Int> = preferencesRepository.coinsFlow.stateIn(
+            viewModelScope,
+            SharingStarted.WhileSubscribed(5000),
+            0
+        )
 
-    val highScore: StateFlow<Int> = preferencesRepository.highScoreFlow
-        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), 0)
+    val highScore: StateFlow<Int> = preferencesRepository.highScoreFlow.stateIn(
+            viewModelScope,
+            SharingStarted.WhileSubscribed(5000),
+            0
+        )
 
-    val bestStreak: StateFlow<Int> = preferencesRepository.bestStreakFlow
-        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), 0)
+    val bestStreak: StateFlow<Int> = preferencesRepository.bestStreakFlow.stateIn(
+            viewModelScope,
+            SharingStarted.WhileSubscribed(5000),
+            0
+        )
 
     private var timerJob: Job? = null
 
@@ -174,9 +183,7 @@ class GameViewModel(
         } else {
             _gameState.update {
                 it.copy(
-                    board = newBoard,
-                    comboMultiplier = 1,
-                    mistakes = it.mistakes + 1
+                    board = newBoard, comboMultiplier = 1, mistakes = it.mistakes + 1
                 )
             }
             if (_gameState.value.mistakes >= _gameState.value.maxMistakes) {
@@ -264,8 +271,7 @@ class GameViewModel(
                     }
                     _gameState.update {
                         it.copy(
-                            board = newBoard,
-                            mistakes = it.mistakes - 1
+                            board = newBoard, mistakes = it.mistakes - 1
                         )
                     }
                 }
@@ -275,17 +281,15 @@ class GameViewModel(
 
     companion object {
         fun provideFactory(
-            repository: UserPreferencesRepository,
-            gameRecordDao: GameRecordDao
-        ): ViewModelProvider.Factory =
-            object : ViewModelProvider.Factory {
-                @Suppress("UNCHECKED_CAST")
-                override fun <T : ViewModel> create(modelClass: Class<T>): T {
-                    if (modelClass.isAssignableFrom(GameViewModel::class.java)) {
-                        return GameViewModel(repository, gameRecordDao) as T
-                    }
-                    throw IllegalArgumentException("Unknown ViewModel class")
+            repository: UserPreferencesRepository, gameRecordDao: GameRecordDao
+        ): ViewModelProvider.Factory = object : ViewModelProvider.Factory {
+            @Suppress("UNCHECKED_CAST")
+            override fun <T : ViewModel> create(modelClass: Class<T>): T {
+                if (modelClass.isAssignableFrom(GameViewModel::class.java)) {
+                    return GameViewModel(repository, gameRecordDao) as T
                 }
+                throw IllegalArgumentException("Unknown ViewModel class")
             }
+        }
     }
 }

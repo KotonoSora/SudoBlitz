@@ -49,8 +49,7 @@ fun NeonButton(
             .clickable { onClick() }
             .padding(horizontal = 24.dp),
         verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.Start
-    ) {
+        horizontalArrangement = Arrangement.Start) {
         if (icon != null) {
             Icon(
                 imageVector = icon,
@@ -72,10 +71,7 @@ fun NeonButton(
 
 @Composable
 fun NeonTitle(
-    text: String,
-    color: Color,
-    modifier: Modifier = Modifier,
-    fontSize: Int = 48
+    text: String, color: Color, modifier: Modifier = Modifier, fontSize: Int = 48
 ) {
     Text(
         text = text,
@@ -86,8 +82,7 @@ fun NeonTitle(
         modifier = modifier,
         style = TextStyle(
             shadow = Shadow(
-                color = color,
-                blurRadius = 16f
+                color = color, blurRadius = 16f
             )
         )
     )

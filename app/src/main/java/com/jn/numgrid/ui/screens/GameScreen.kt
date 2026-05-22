@@ -34,10 +34,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import com.jn.numgrid.LocalHapticManager
-import com.jn.numgrid.LocalSoundManager
+import com.jn.numgrid.audio.HapticManager
+import com.jn.numgrid.audio.SoundManager
 import com.jn.numgrid.ui.components.NeonText
 import com.jn.numgrid.ui.components.Numpad
 import com.jn.numgrid.ui.components.SudokuGrid
@@ -52,13 +53,13 @@ import java.util.Locale
 @Composable
 fun GameScreen(
     viewModel: GameViewModel,
+    soundManager: SoundManager,
+    hapticManager: HapticManager,
     onNavigateToResult: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     val gameState by viewModel.gameState.collectAsState()
     val coins by viewModel.coins.collectAsState()
-    val soundManager = LocalSoundManager.current
-    val hapticManager = LocalHapticManager.current
 
     LaunchedEffect(gameState.isGameOver) {
         if (gameState.isGameOver) {
@@ -97,9 +98,7 @@ fun GameScreen(
                     containerColor = Color.Transparent
                 )
             )
-        },
-        containerColor = MaterialTheme.colorScheme.background,
-        modifier = modifier.fillMaxSize()
+        }, containerColor = MaterialTheme.colorScheme.background, modifier = modifier.fillMaxSize()
     ) { innerPadding ->
         Column(
             modifier = Modifier
@@ -142,8 +141,7 @@ fun GameScreen(
                     onClick = {
                         soundManager.playTap()
                         viewModel.addTime()
-                    }
-                )
+                    })
                 BoostButton(
                     icon = Icons.Rounded.Lightbulb,
                     label = "Hint",
@@ -152,8 +150,7 @@ fun GameScreen(
                     onClick = {
                         soundManager.playTap()
                         viewModel.useHint()
-                    }
-                )
+                    })
                 BoostButton(
                     icon = Icons.AutoMirrored.Rounded.Undo,
                     label = "Undo",
@@ -162,17 +159,14 @@ fun GameScreen(
                     onClick = {
                         soundManager.playTap()
                         viewModel.undoMistake()
-                    }
-                )
+                    })
             }
 
             Numpad(
-                size = gameState.currentSize,
-                onNumberSelected = {
+                size = gameState.currentSize, onNumberSelected = {
                     soundManager.playTap()
                     viewModel.inputNumber(it)
-                },
-                modifier = Modifier.padding(16.dp)
+                }, modifier = Modifier.padding(16.dp)
             )
         }
     }
@@ -187,7 +181,8 @@ fun GameStatsHeader(gameState: GameState, modifier: Modifier = Modifier) {
     ) {
         val minutes = gameState.timeRemaining / 60
         val seconds = gameState.timeRemaining % 60
-        val timeStr = String.format(Locale.getDefault(), "%02d:%02d", minutes, seconds)
+        val locale = LocalConfiguration.current.locales[0] ?: Locale.getDefault()
+        val timeStr = String.format(locale, "%02d:%02d", minutes, seconds)
 
         // Timer Section
         Box(modifier = Modifier.weight(1f), contentAlignment = Alignment.CenterStart) {
@@ -243,8 +238,7 @@ fun BoostButton(
         modifier = modifier.height(64.dp),
         contentPadding = PaddingValues(horizontal = 12.dp),
         colors = ButtonDefaults.elevatedButtonColors(
-            containerColor = MaterialTheme.colorScheme.surfaceVariant,
-            contentColor = NeonCyan
+            containerColor = MaterialTheme.colorScheme.surfaceVariant, contentColor = NeonCyan
         )
     ) {
         Column(

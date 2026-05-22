@@ -35,10 +35,7 @@ import com.jn.numgrid.viewmodel.GameState
 
 @Composable
 fun ResultScreen(
-    gameState: GameState,
-    onPlayAgain: () -> Unit,
-    onHome: () -> Unit,
-    modifier: Modifier = Modifier
+    gameState: GameState, onPlayAgain: () -> Unit, onHome: () -> Unit, modifier: Modifier = Modifier
 ) {
     val bgColor = DarkBackground
 
@@ -72,9 +69,7 @@ fun ResultScreen(
                 NeonText("Final Score", NeonBlue, fontSize = 20)
                 Spacer(modifier = Modifier.height(8.dp))
                 NeonText(
-                    text = gameState.score.toString(),
-                    color = NeonYellow,
-                    fontSize = 32
+                    text = gameState.score.toString(), color = NeonYellow, fontSize = 32
                 )
 
                 Spacer(modifier = Modifier.height(24.dp))
@@ -82,9 +77,7 @@ fun ResultScreen(
                 NeonText("Streak", NeonMagenta, fontSize = 16)
                 Spacer(modifier = Modifier.height(8.dp))
                 NeonText(
-                    text = gameState.streak.toString(),
-                    color = NeonCyan,
-                    fontSize = 24
+                    text = gameState.streak.toString(), color = NeonCyan, fontSize = 24
                 )
             }
         }
@@ -101,10 +94,7 @@ fun ResultScreen(
         Spacer(modifier = Modifier.height(16.dp))
 
         NeonButton(
-            text = "HOME",
-            color = NeonMagenta,
-            icon = Icons.Rounded.Home,
-            onClick = onHome
+            text = "HOME", color = NeonMagenta, icon = Icons.Rounded.Home, onClick = onHome
         )
     }
 }

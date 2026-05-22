@@ -29,20 +29,16 @@ data class StoreProduct(
 )
 
 class BillingManager(
-    private val context: Context,
-    private val preferencesRepository: UserPreferencesRepository
+    private val context: Context, private val preferencesRepository: UserPreferencesRepository
 ) : PurchasesUpdatedListener {
 
     private val isDebug = (context.applicationInfo.flags and ApplicationInfo.FLAG_DEBUGGABLE) != 0
 
-    private val pendingPurchasesParams = PendingPurchasesParams.newBuilder()
-        .enableOneTimeProducts()
-        .build()
+    private val pendingPurchasesParams =
+        PendingPurchasesParams.newBuilder().enableOneTimeProducts().build()
 
-    private val billingClient: BillingClient = BillingClient.newBuilder(context)
-        .setListener(this)
-        .enablePendingPurchases(pendingPurchasesParams)
-        .build()
+    private val billingClient: BillingClient = BillingClient.newBuilder(context).setListener(this)
+        .enablePendingPurchases(pendingPurchasesParams).build()
 
     private val _products = MutableStateFlow<List<StoreProduct>>(emptyList())
     val products: StateFlow<List<StoreProduct>> = _products.asStateFlow()
@@ -89,26 +85,28 @@ class BillingManager(
         }
 
         val productIds = listOf(
-            "coins_100", "coins_500", "coins_1000", "coins_1500",
-            "coins_2000", "coins_2500", "coins_3000", "coins_3500", "coins_4000"
+            "coins_100",
+            "coins_500",
+            "coins_1000",
+            "coins_1500",
+            "coins_2000",
+            "coins_2500",
+            "coins_3000",
+            "coins_3500",
+            "coins_4000"
         )
 
         val productList = productIds.map { id ->
-            QueryProductDetailsParams.Product.newBuilder()
-                .setProductId(id)
-                .setProductType(BillingClient.ProductType.INAPP)
-                .build()
+            QueryProductDetailsParams.Product.newBuilder().setProductId(id)
+                .setProductType(BillingClient.ProductType.INAPP).build()
         }
 
-        val params = QueryProductDetailsParams.newBuilder()
-            .setProductList(productList)
-            .build()
+        val params = QueryProductDetailsParams.newBuilder().setProductList(productList).build()
 
         billingClient.queryProductDetailsAsync(params) { billingResult, result ->
             if (billingResult.responseCode == BillingClient.BillingResponseCode.OK) {
                 // Sort the products based on their coin value
-                val sortedProducts = result.productDetailsList
-                    .sortedBy { details ->
+                val sortedProducts = result.productDetailsList.sortedBy { details ->
                         when (details.productId) {
                             "coins_100" -> 100
                             "coins_500" -> 500
@@ -145,14 +143,13 @@ class BillingManager(
         val originalDetails = product.originalDetails ?: return
 
         val productDetailsParamsList = listOf(
-            BillingFlowParams.ProductDetailsParams.newBuilder()
-                .setProductDetails(originalDetails)
+            BillingFlowParams.ProductDetailsParams.newBuilder().setProductDetails(originalDetails)
                 .build()
         )
 
-        val billingFlowParams = BillingFlowParams.newBuilder()
-            .setProductDetailsParamsList(productDetailsParamsList)
-            .build()
+        val billingFlowParams =
+            BillingFlowParams.newBuilder().setProductDetailsParamsList(productDetailsParamsList)
+                .build()
 
         billingClient.launchBillingFlow(activity, billingFlowParams)
     }
@@ -168,9 +165,8 @@ class BillingManager(
     private fun handlePurchase(purchase: Purchase) {
         if (purchase.purchaseState == Purchase.PurchaseState.PURCHASED) {
             if (!purchase.isAcknowledged) {
-                val consumeParams = ConsumeParams.newBuilder()
-                    .setPurchaseToken(purchase.purchaseToken)
-                    .build()
+                val consumeParams =
+                    ConsumeParams.newBuilder().setPurchaseToken(purchase.purchaseToken).build()
 
                 billingClient.consumeAsync(consumeParams) { billingResult, _ ->
                     if (billingResult.responseCode == BillingClient.BillingResponseCode.OK) {
@@ -179,9 +175,8 @@ class BillingManager(
                     }
                 }
             } else {
-                val consumeParams = ConsumeParams.newBuilder()
-                    .setPurchaseToken(purchase.purchaseToken)
-                    .build()
+                val consumeParams =
+                    ConsumeParams.newBuilder().setPurchaseToken(purchase.purchaseToken).build()
 
                 billingClient.consumeAsync(consumeParams) { billingResult, _ ->
                     if (billingResult.responseCode == BillingClient.BillingResponseCode.OK) {

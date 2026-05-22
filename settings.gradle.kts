@@ -22,5 +22,5 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "SudoBlitz"
+rootProject.name = "NumGrid"
 include(":app")

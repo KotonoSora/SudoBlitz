@@ -16,8 +16,7 @@ class HapticManager(context: Context, private val repository: UserPreferencesRep
             context.getSystemService(Context.VIBRATOR_MANAGER_SERVICE) as VibratorManager
         vibratorManager.defaultVibrator
     } else {
-        @Suppress("DEPRECATION")
-        context.getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
+        @Suppress("DEPRECATION") context.getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
     }
 
     private var hapticEnabled = true
@@ -36,13 +35,11 @@ class HapticManager(context: Context, private val repository: UserPreferencesRep
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                 vibrator.vibrate(
                     VibrationEffect.createOneShot(
-                        50,
-                        VibrationEffect.DEFAULT_AMPLITUDE
+                        50, VibrationEffect.DEFAULT_AMPLITUDE
                     )
                 )
             } else {
-                @Suppress("DEPRECATION")
-                vibrator.vibrate(50)
+                @Suppress("DEPRECATION") vibrator.vibrate(50)
             }
         }
     }
