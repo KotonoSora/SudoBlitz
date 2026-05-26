@@ -42,6 +42,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.jn.numgrid.billing.StoreProduct
@@ -49,6 +50,7 @@ import com.jn.numgrid.ui.components.NeonText
 import com.jn.numgrid.ui.components.RetroFont
 import com.jn.numgrid.ui.theme.CoinGold
 import com.jn.numgrid.ui.theme.DarkBackground
+import com.jn.numgrid.ui.theme.GameTheme
 import com.jn.numgrid.ui.theme.NeonCyan
 import com.jn.numgrid.ui.theme.NeonMagenta
 import com.jn.numgrid.ui.theme.SurfaceDark
@@ -61,41 +63,63 @@ fun ShopScreen(
 ) {
     val products by viewModel.products.collectAsState()
     val coins by viewModel.coins.collectAsState()
-    val activity = LocalActivity.current ?: return
+
+    ShopContent(
+        products = products, coins = coins, onBack = onBack, onBuyProduct = { product, activity ->
+            viewModel.buyProduct(activity, product)
+        }, modifier = modifier
+    )
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun ShopContent(
+    products: List<StoreProduct>,
+    coins: Int,
+    onBack: () -> Unit,
+    onBuyProduct: (StoreProduct, android.app.Activity) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    val activity = LocalActivity.current
 
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { NeonText("Coin Shop", NeonCyan, fontSize = 24) }, navigationIcon = {
-                IconButton(onClick = onBack) {
-                    Icon(
-                        Icons.AutoMirrored.Rounded.ArrowBack,
-                        contentDescription = "Back",
-                        tint = NeonCyan
-                    )
-                }
-            }, actions = {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier.padding(end = 16.dp)
-                ) {
-                    Icon(
-                        imageVector = Icons.Rounded.MonetizationOn,
-                        contentDescription = "Coins",
-                        tint = CoinGold,
-                        modifier = Modifier.size(24.dp)
-                    )
-                    Spacer(modifier = Modifier.width(4.dp))
-                    NeonText(
-                        text = coins.toString(), color = CoinGold, fontSize = 18
-                    )
-                }
-            }, colors = TopAppBarDefaults.topAppBarColors(
-                containerColor = DarkBackground,
-                titleContentColor = NeonCyan,
-                navigationIconContentColor = NeonCyan,
-                actionIconContentColor = NeonCyan
-            )
+                title = {
+                    NeonText("Coin Shop", NeonCyan, fontSize = 24)
+                },
+                navigationIcon = {
+                    IconButton(onClick = onBack) {
+                        Icon(
+                            Icons.AutoMirrored.Rounded.ArrowBack,
+                            contentDescription = "Back",
+                            tint = NeonCyan
+                        )
+                    }
+                },
+                actions = {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier.padding(end = 16.dp)
+                    ) {
+                        Icon(
+                            imageVector = Icons.Rounded.MonetizationOn,
+                            contentDescription = "Coins",
+                            tint = CoinGold,
+                            modifier = Modifier.size(24.dp)
+                        )
+                        Spacer(modifier = Modifier.width(4.dp))
+                        NeonText(
+                            text = coins.toString(), color = CoinGold, fontSize = 18
+                        )
+                    }
+                },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = DarkBackground,
+                    titleContentColor = NeonCyan,
+                    navigationIconContentColor = NeonCyan,
+                    actionIconContentColor = NeonCyan
+                ),
             )
         }, modifier = modifier.fillMaxSize(), containerColor = DarkBackground
     ) { innerPadding ->
@@ -124,8 +148,9 @@ fun ShopScreen(
                 ) {
                     items(products) { product ->
                         ProductItem(
-                            product = product,
-                            onPurchaseClick = { viewModel.buyProduct(activity, product) })
+                            product = product, onPurchaseClick = {
+                                activity?.let { onBuyProduct(product, it) }
+                            })
                     }
                 }
             }
@@ -138,19 +163,7 @@ fun ProductItem(
     product: StoreProduct, onPurchaseClick: () -> Unit, modifier: Modifier = Modifier
 ) {
     val price = product.price
-
-    val coinsAmount = when (product.productId) {
-        "coins_100" -> 100
-        "coins_500" -> 500
-        "coins_1000" -> 1000
-        "coins_1500" -> 1500
-        "coins_2000" -> 2000
-        "coins_2500" -> 2500
-        "coins_3000" -> 3000
-        "coins_3500" -> 3500
-        "coins_4000" -> 4000
-        else -> 0
-    }
+    val coinsAmount = product.coinAmount
 
     Card(
         modifier = modifier.fillMaxWidth(),
@@ -217,5 +230,17 @@ fun ProductItem(
                 )
             }
         }
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun ShopScreenPreview() {
+    GameTheme {
+        ShopContent(
+            products = PreviewData.mockProducts,
+            coins = 500,
+            onBack = {},
+            onBuyProduct = { _, _ -> })
     }
 }

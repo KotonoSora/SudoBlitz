@@ -44,7 +44,7 @@ class UserPreferencesRepository(private val dataStore: DataStore<Preferences>) {
     }
 
     val hapticEnabledFlow: Flow<Boolean> = dataStore.data.map { preferences ->
-        preferences[HAPTIC_ENABLED_KEY] ?: true
+        preferences[HAPTIC_ENABLED_KEY] ?: false
     }
 
     suspend fun updateCoins(delta: Int) {

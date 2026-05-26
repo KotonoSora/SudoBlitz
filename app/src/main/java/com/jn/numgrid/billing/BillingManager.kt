@@ -25,36 +25,93 @@ data class StoreProduct(
     val productId: String,
     val title: String,
     val price: String,
+    val coinAmount: Int,
     val originalDetails: ProductDetails? = null
 )
 
 class BillingManager(
-    private val context: Context, private val preferencesRepository: UserPreferencesRepository
+    private val context: Context,
+    private val preferencesRepository: UserPreferencesRepository,
+    private val isPreview: Boolean = false
 ) : PurchasesUpdatedListener {
 
-    private val isDebug = (context.applicationInfo.flags and ApplicationInfo.FLAG_DEBUGGABLE) != 0
+    companion object {
+        private val productMap = mapOf(
+            "coins_100" to 100,
+            "coins_500" to 500,
+            "coins_1000" to 1000,
+            "coins_1500" to 1500,
+            "coins_2000" to 2000,
+            "coins_2500" to 2500,
+            "coins_3000" to 3000,
+            "coins_3500" to 3500,
+            "coins_4000" to 4000
+        )
 
-    private val pendingPurchasesParams =
+        val productIds = productMap.keys.toList()
+
+        fun getCoinAmount(productId: String): Int = productMap[productId] ?: 0
+    }
+
+    private var isDebug = isPreview
+
+    private val pendingPurchasesParams by lazy {
         PendingPurchasesParams.newBuilder().enableOneTimeProducts().build()
+    }
 
-    private val billingClient: BillingClient = BillingClient.newBuilder(context).setListener(this)
-        .enablePendingPurchases(pendingPurchasesParams).build()
+    private val billingClient: BillingClient? by lazy {
+        if (isPreview) {
+            null
+        } else {
+            try {
+                BillingClient.newBuilder(context).setListener(this)
+                    .enablePendingPurchases(pendingPurchasesParams).build()
+            } catch (e: Exception) {
+                e.printStackTrace()
+                null
+            }
+        }
+    }
 
-    private val _products = MutableStateFlow<List<StoreProduct>>(emptyList())
+    private val _products = MutableStateFlow<List<StoreProduct>>(
+        if (isPreview) {
+            productIds.map { id ->
+                StoreProduct(id, "${getCoinAmount(id)} Coins", "$0.99", getCoinAmount(id))
+            }
+        } else emptyList()
+    )
     val products: StateFlow<List<StoreProduct>> = _products.asStateFlow()
+
+    fun setMockProducts(mockProducts: List<StoreProduct>) {
+        if (isPreview) {
+            _products.value = mockProducts
+        }
+    }
 
     private val scope = CoroutineScope(Dispatchers.IO)
 
     init {
-        if (isDebug) {
-            queryProducts()
+        if (isPreview) {
+            isDebug = true
+            // products already initialized in _products declaration
         } else {
-            startConnection()
+            try {
+                isDebug = (context.applicationInfo?.let { (it.flags and ApplicationInfo.FLAG_DEBUGGABLE) != 0 } ?: true)
+            } catch (e: Exception) {
+                e.printStackTrace()
+                isDebug = true
+            }
+
+            if (isDebug) {
+                queryProducts()
+            } else {
+                startConnection()
+            }
         }
     }
 
     private fun startConnection() {
-        billingClient.startConnection(object : BillingClientStateListener {
+        billingClient?.startConnection(object : BillingClientStateListener {
             override fun onBillingSetupFinished(billingResult: BillingResult) {
                 if (billingResult.responseCode == BillingClient.BillingResponseCode.OK) {
                     queryProducts()
@@ -69,32 +126,12 @@ class BillingManager(
 
     private fun queryProducts() {
         if (isDebug) {
-            val mockProducts = listOf(
-                StoreProduct("coins_100", "100 Coins", "$0.29"),
-                StoreProduct("coins_500", "500 Coins", "$0.49"),
-                StoreProduct("coins_1000", "1000 Coins", "$0.69"),
-                StoreProduct("coins_1500", "1500 Coins", "$0.99"),
-                StoreProduct("coins_2000", "2000 Coins", "$1.99"),
-                StoreProduct("coins_2500", "2500 Coins", "$3.99"),
-                StoreProduct("coins_3000", "3000 Coins", "$4.99"),
-                StoreProduct("coins_3500", "3500 Coins", "$7.99"),
-                StoreProduct("coins_4000", "4000 Coins", "$9.99")
-            )
+            val mockProducts = productIds.map { id ->
+                StoreProduct(id, "${getCoinAmount(id)} Coins", "$0.99", getCoinAmount(id))
+            }
             _products.value = mockProducts
             return
         }
-
-        val productIds = listOf(
-            "coins_100",
-            "coins_500",
-            "coins_1000",
-            "coins_1500",
-            "coins_2000",
-            "coins_2500",
-            "coins_3000",
-            "coins_3500",
-            "coins_4000"
-        )
 
         val productList = productIds.map { id ->
             QueryProductDetailsParams.Product.newBuilder().setProductId(id)
@@ -103,28 +140,18 @@ class BillingManager(
 
         val params = QueryProductDetailsParams.newBuilder().setProductList(productList).build()
 
-        billingClient.queryProductDetailsAsync(params) { billingResult, result ->
+        billingClient?.queryProductDetailsAsync(params) { billingResult, result ->
             if (billingResult.responseCode == BillingClient.BillingResponseCode.OK) {
                 // Sort the products based on their coin value
                 val sortedProducts = result.productDetailsList.sortedBy { details ->
-                        when (details.productId) {
-                            "coins_100" -> 100
-                            "coins_500" -> 500
-                            "coins_1000" -> 1000
-                            "coins_1500" -> 1500
-                            "coins_2000" -> 2000
-                            "coins_2500" -> 2500
-                            "coins_3000" -> 3000
-                            "coins_3500" -> 3500
-                            "coins_4000" -> 4000
-                            else -> Int.MAX_VALUE
-                        }
+                        getCoinAmount(details.productId)
                     }.map { details ->
                         StoreProduct(
                             productId = details.productId,
                             title = details.title,
                             price = details.oneTimePurchaseOfferDetails?.formattedPrice
                                 ?: "Unknown",
+                            coinAmount = getCoinAmount(details.productId),
                             originalDetails = details
                         )
                     }
@@ -151,7 +178,7 @@ class BillingManager(
             BillingFlowParams.newBuilder().setProductDetailsParamsList(productDetailsParamsList)
                 .build()
 
-        billingClient.launchBillingFlow(activity, billingFlowParams)
+        billingClient?.launchBillingFlow(activity, billingFlowParams)
     }
 
     override fun onPurchasesUpdated(billingResult: BillingResult, purchases: List<Purchase>?) {
@@ -168,7 +195,7 @@ class BillingManager(
                 val consumeParams =
                     ConsumeParams.newBuilder().setPurchaseToken(purchase.purchaseToken).build()
 
-                billingClient.consumeAsync(consumeParams) { billingResult, _ ->
+                billingClient?.consumeAsync(consumeParams) { billingResult, _ ->
                     if (billingResult.responseCode == BillingClient.BillingResponseCode.OK) {
                         // Grant coins to user
                         grantCoins(purchase.products)
@@ -178,7 +205,7 @@ class BillingManager(
                 val consumeParams =
                     ConsumeParams.newBuilder().setPurchaseToken(purchase.purchaseToken).build()
 
-                billingClient.consumeAsync(consumeParams) { billingResult, _ ->
+                billingClient?.consumeAsync(consumeParams) { billingResult, _ ->
                     if (billingResult.responseCode == BillingClient.BillingResponseCode.OK) {
                         // Already acknowledged but grant coins and consume if applicable
                         grantCoins(purchase.products)
@@ -192,18 +219,7 @@ class BillingManager(
         scope.launch {
             var coinsToAdd = 0
             for (productId in productIds) {
-                coinsToAdd += when (productId) {
-                    "coins_100" -> 100
-                    "coins_500" -> 500
-                    "coins_1000" -> 1000
-                    "coins_1500" -> 1500
-                    "coins_2000" -> 2000
-                    "coins_2500" -> 2500
-                    "coins_3000" -> 3000
-                    "coins_3500" -> 3500
-                    "coins_4000" -> 4000
-                    else -> 0
-                }
+                coinsToAdd += getCoinAmount(productId)
             }
             if (coinsToAdd > 0) {
                 preferencesRepository.updateCoins(coinsToAdd)
@@ -212,6 +228,6 @@ class BillingManager(
     }
 
     fun endConnection() {
-        billingClient.endConnection()
+        billingClient?.endConnection()
     }
 }

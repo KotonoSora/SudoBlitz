@@ -9,8 +9,12 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
-class SoundManager(context: Context, private val repository: UserPreferencesRepository) {
-    private val soundPool: SoundPool
+class SoundManager(
+    context: Context,
+    private val repository: UserPreferencesRepository,
+    isPreview: Boolean = false,
+) {
+    private val soundPool: SoundPool?
     private var tapSoundId: Int = 0
     private var errorSoundId: Int = 0
     private var winSoundId: Int = 0
@@ -20,15 +24,24 @@ class SoundManager(context: Context, private val repository: UserPreferencesRepo
     private val scope = CoroutineScope(Dispatchers.IO)
 
     init {
-        val audioAttributes = AudioAttributes.Builder().setUsage(AudioAttributes.USAGE_GAME)
-            .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION).build()
+        var tempSoundPool: SoundPool? = null
+        if (!isPreview) {
+            try {
+                val audioAttributes = AudioAttributes.Builder().setUsage(AudioAttributes.USAGE_GAME)
+                    .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION).build()
 
-        soundPool = SoundPool.Builder().setMaxStreams(5).setAudioAttributes(audioAttributes).build()
+                tempSoundPool = SoundPool.Builder().setMaxStreams(5).setAudioAttributes(audioAttributes).build()
 
-        tapSoundId = soundPool.load(context, R.raw.tap, 1)
-        errorSoundId = soundPool.load(context, R.raw.error, 1)
-        winSoundId = soundPool.load(context, R.raw.win, 1)
-        loseSoundId = soundPool.load(context, R.raw.lose, 1)
+                tapSoundId = tempSoundPool.load(context, R.raw.tap, 1)
+                errorSoundId = tempSoundPool.load(context, R.raw.error, 1)
+                winSoundId = tempSoundPool.load(context, R.raw.win, 1)
+                loseSoundId = tempSoundPool.load(context, R.raw.lose, 1)
+            } catch (e: Throwable) {
+                // Safely catch NoClassDefFoundError / ClassNotFoundException or other exceptions in Compose Previews / Layoutlib
+                e.printStackTrace()
+            }
+        }
+        soundPool = tempSoundPool
 
         scope.launch {
             repository.soundEnabledFlow.collect {
@@ -39,29 +52,29 @@ class SoundManager(context: Context, private val repository: UserPreferencesRepo
 
     fun playTap() {
         if (soundEnabled) {
-            soundPool.play(tapSoundId, 1f, 1f, 0, 0, 1f)
+            soundPool?.play(tapSoundId, 1f, 1f, 0, 0, 1f)
         }
     }
 
     fun playError() {
         if (soundEnabled) {
-            soundPool.play(errorSoundId, 1f, 1f, 0, 0, 1f)
+            soundPool?.play(errorSoundId, 1f, 1f, 0, 0, 1f)
         }
     }
 
     fun playWin() {
         if (soundEnabled) {
-            soundPool.play(winSoundId, 1f, 1f, 0, 0, 1f)
+            soundPool?.play(winSoundId, 1f, 1f, 0, 0, 1f)
         }
     }
 
     fun playLose() {
         if (soundEnabled) {
-            soundPool.play(loseSoundId, 1f, 1f, 0, 0, 1f)
+            soundPool?.play(loseSoundId, 1f, 1f, 0, 0, 1f)
         }
     }
 
     fun release() {
-        soundPool.release()
+        soundPool?.release()
     }
 }
