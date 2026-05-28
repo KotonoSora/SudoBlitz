@@ -16,6 +16,8 @@ import com.android.billingclient.api.QueryProductDetailsParams
 import com.jn.numgrid.data.UserPreferencesRepository
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -24,36 +26,47 @@ import kotlinx.coroutines.launch
 data class StoreProduct(
     val productId: String,
     val title: String,
-    val price: String,
+    val price: String?,
     val coinAmount: Int,
     val originalDetails: ProductDetails? = null
 )
+
+enum class BillingStatus {
+    IDLE, CONNECTING, CONNECTED, ERROR, EMPTY
+}
 
 class BillingManager(
     private val context: Context,
     private val preferencesRepository: UserPreferencesRepository,
     private val isPreview: Boolean = false
-) : PurchasesUpdatedListener {
+) {
 
     companion object {
-        private val productMap = mapOf(
-            "coins_100" to 100,
-            "coins_500" to 500,
-            "coins_1000" to 1000,
-            "coins_1500" to 1500,
-            "coins_2000" to 2000,
-            "coins_2500" to 2500,
-            "coins_3000" to 3000,
-            "coins_3500" to 3500,
-            "coins_4000" to 4000
-        )
-
-        val productIds = productMap.keys.toList()
-
-        fun getCoinAmount(productId: String): Int = productMap[productId] ?: 0
+        fun getDebugProducts(): List<StoreProduct> = ShopData.productIds.map { id ->
+            val coinAmount = ShopData.getCoinAmount(id)
+            StoreProduct(
+                productId = id,
+                title = "$coinAmount Coins",
+                price = ShopData.getDebugPrice(id),
+                coinAmount = coinAmount
+            )
+        }
     }
 
     private var isDebug = isPreview
+
+    private val managerScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
+
+    private val _status = MutableStateFlow(BillingStatus.IDLE)
+    val status = _status.asStateFlow()
+
+    private val purchasesUpdatedListener = PurchasesUpdatedListener { billingResult, purchases ->
+        if (billingResult.responseCode == BillingClient.BillingResponseCode.OK && purchases != null) {
+            for (purchase in purchases) {
+                handlePurchase(purchase)
+            }
+        }
+    }
 
     private val pendingPurchasesParams by lazy {
         PendingPurchasesParams.newBuilder().enableOneTimeProducts().build()
@@ -64,7 +77,7 @@ class BillingManager(
             null
         } else {
             try {
-                BillingClient.newBuilder(context).setListener(this)
+                BillingClient.newBuilder(context).setListener(purchasesUpdatedListener)
                     .enablePendingPurchases(pendingPurchasesParams).build()
             } catch (e: Exception) {
                 e.printStackTrace()
@@ -74,29 +87,36 @@ class BillingManager(
     }
 
     private val _products = MutableStateFlow<List<StoreProduct>>(
-        if (isPreview) {
-            productIds.map { id ->
-                StoreProduct(id, "${getCoinAmount(id)} Coins", "$0.99", getCoinAmount(id))
-            }
-        } else emptyList()
+        if (isPreview) getDebugProducts() else emptyList()
     )
     val products: StateFlow<List<StoreProduct>> = _products.asStateFlow()
 
     fun setMockProducts(mockProducts: List<StoreProduct>) {
         if (isPreview) {
             _products.value = mockProducts
+            if (mockProducts.isEmpty()) {
+                _status.value = BillingStatus.EMPTY
+            } else {
+                _status.value = BillingStatus.CONNECTED
+            }
         }
     }
 
-    private val scope = CoroutineScope(Dispatchers.IO)
 
     init {
         if (isPreview) {
             isDebug = true
             // products already initialized in _products declaration
+            if (_products.value.isEmpty()) {
+                _status.value = BillingStatus.EMPTY
+            } else {
+                _status.value = BillingStatus.CONNECTED
+            }
         } else {
             try {
-                isDebug = (context.applicationInfo?.let { (it.flags and ApplicationInfo.FLAG_DEBUGGABLE) != 0 } ?: true)
+                isDebug =
+                    (context.applicationInfo?.let { (it.flags and ApplicationInfo.FLAG_DEBUGGABLE) != 0 }
+                        ?: true)
             } catch (e: Exception) {
                 e.printStackTrace()
                 isDebug = true
@@ -110,30 +130,39 @@ class BillingManager(
         }
     }
 
-    private fun startConnection() {
+    fun startConnection() {
+        if (_status.value == BillingStatus.CONNECTING || _status.value == BillingStatus.CONNECTED) return
+
+        _status.value = BillingStatus.CONNECTING
         billingClient?.startConnection(object : BillingClientStateListener {
             override fun onBillingSetupFinished(billingResult: BillingResult) {
                 if (billingResult.responseCode == BillingClient.BillingResponseCode.OK) {
+                    _status.value = BillingStatus.CONNECTED
                     queryProducts()
+                } else {
+                    _status.value = BillingStatus.ERROR
                 }
             }
 
             override fun onBillingServiceDisconnected() {
-                // Try to restart the connection on the next request to Google Play
+                _status.value = BillingStatus.IDLE
             }
         })
     }
 
     private fun queryProducts() {
         if (isDebug) {
-            val mockProducts = productIds.map { id ->
-                StoreProduct(id, "${getCoinAmount(id)} Coins", "$0.99", getCoinAmount(id))
+            val debugProducts = getDebugProducts()
+            _products.value = debugProducts
+            if (debugProducts.isEmpty()) {
+                _status.value = BillingStatus.EMPTY
+            } else {
+                _status.value = BillingStatus.CONNECTED
             }
-            _products.value = mockProducts
             return
         }
 
-        val productList = productIds.map { id ->
+        val productList = ShopData.productIds.map { id ->
             QueryProductDetailsParams.Product.newBuilder().setProductId(id)
                 .setProductType(BillingClient.ProductType.INAPP).build()
         }
@@ -142,20 +171,25 @@ class BillingManager(
 
         billingClient?.queryProductDetailsAsync(params) { billingResult, result ->
             if (billingResult.responseCode == BillingClient.BillingResponseCode.OK) {
+                val detailsList = result.productDetailsList
+                if (detailsList.isEmpty()) {
+                    _status.value = BillingStatus.EMPTY
+                }
                 // Sort the products based on their coin value
-                val sortedProducts = result.productDetailsList.sortedBy { details ->
-                        getCoinAmount(details.productId)
-                    }.map { details ->
-                        StoreProduct(
-                            productId = details.productId,
-                            title = details.title,
-                            price = details.oneTimePurchaseOfferDetails?.formattedPrice
-                                ?: "Unknown",
-                            coinAmount = getCoinAmount(details.productId),
-                            originalDetails = details
-                        )
-                    }
+                val sortedProducts = detailsList.sortedBy { details ->
+                    ShopData.getCoinAmount(details.productId)
+                }.map { details ->
+                    StoreProduct(
+                        productId = details.productId,
+                        title = details.title,
+                        price = details.oneTimePurchaseOfferDetails?.formattedPrice,
+                        coinAmount = ShopData.getCoinAmount(details.productId),
+                        originalDetails = details
+                    )
+                }
                 _products.value = sortedProducts
+            } else {
+                _status.value = BillingStatus.ERROR
             }
         }
     }
@@ -179,14 +213,6 @@ class BillingManager(
                 .build()
 
         billingClient?.launchBillingFlow(activity, billingFlowParams)
-    }
-
-    override fun onPurchasesUpdated(billingResult: BillingResult, purchases: List<Purchase>?) {
-        if (billingResult.responseCode == BillingClient.BillingResponseCode.OK && purchases != null) {
-            for (purchase in purchases) {
-                handlePurchase(purchase)
-            }
-        }
     }
 
     private fun handlePurchase(purchase: Purchase) {
@@ -216,10 +242,10 @@ class BillingManager(
     }
 
     private fun grantCoins(productIds: List<String>) {
-        scope.launch {
+        managerScope.launch {
             var coinsToAdd = 0
             for (productId in productIds) {
-                coinsToAdd += getCoinAmount(productId)
+                coinsToAdd += ShopData.getCoinAmount(productId)
             }
             if (coinsToAdd > 0) {
                 preferencesRepository.updateCoins(coinsToAdd)
@@ -227,7 +253,8 @@ class BillingManager(
         }
     }
 
-    fun endConnection() {
+    fun release() {
         billingClient?.endConnection()
+        managerScope.cancel()
     }
 }

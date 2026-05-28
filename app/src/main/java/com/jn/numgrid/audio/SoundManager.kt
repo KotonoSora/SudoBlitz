@@ -30,7 +30,8 @@ class SoundManager(
                 val audioAttributes = AudioAttributes.Builder().setUsage(AudioAttributes.USAGE_GAME)
                     .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION).build()
 
-                tempSoundPool = SoundPool.Builder().setMaxStreams(5).setAudioAttributes(audioAttributes).build()
+                tempSoundPool =
+                    SoundPool.Builder().setMaxStreams(5).setAudioAttributes(audioAttributes).build()
 
                 tapSoundId = tempSoundPool.load(context, R.raw.tap, 1)
                 errorSoundId = tempSoundPool.load(context, R.raw.error, 1)

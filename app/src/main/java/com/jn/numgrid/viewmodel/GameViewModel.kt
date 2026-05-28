@@ -3,13 +3,19 @@ package com.jn.numgrid.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
+import com.jn.numgrid.application.game.InputNumberUseCase
+import com.jn.numgrid.application.game.NextLevelUseCase
+import com.jn.numgrid.application.game.StartNewGameUseCase
+import com.jn.numgrid.application.game.UndoMistakeUseCase
+import com.jn.numgrid.application.game.UseHintUseCase
 import com.jn.numgrid.data.GameRecord
 import com.jn.numgrid.data.GameRecordDao
 import com.jn.numgrid.data.UserPreferencesRepository
-import com.jn.numgrid.engine.SudokuEngine
-import com.jn.numgrid.model.Board
-import com.jn.numgrid.model.Cell
-import com.jn.numgrid.model.Difficulty
+import com.jn.numgrid.domain.game.Board
+import com.jn.numgrid.domain.game.Cell
+import com.jn.numgrid.domain.game.CoinRewardPolicy
+import com.jn.numgrid.domain.game.Difficulty
+import com.jn.numgrid.domain.game.GameSession
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -26,41 +32,79 @@ data class GameState(
     val selectedCell: Cell? = null,
     val timeRemaining: Int = 180, // 3 minutes
     val score: Int = 0,
-    val comboMultiplier: Int = 1,
+    val comboMultiplier: Int = 0,
     val mistakes: Int = 0,
     val maxMistakes: Int = 3,
     val isGameOver: Boolean = false,
     val isVictory: Boolean = false,
     val currentDifficulty: Difficulty = Difficulty.EASY,
     val currentSize: Int = 4,
-    val streak: Int = 0
-)
+    val streak: Int = 0,
+    val coinsEarned: Int = 0,
+    val coinDetails: String = "",
+) {
+    fun toSession(): GameSession? {
+        val b = board ?: return null
+        return GameSession(
+            board = b,
+            difficulty = currentDifficulty,
+            score = score,
+            mistakes = mistakes,
+            maxMistakes = maxMistakes,
+            comboMultiplier = comboMultiplier,
+            isGameOver = isGameOver,
+            isVictory = isVictory
+        )
+    }
+
+    companion object {
+        fun fromSession(
+            session: GameSession,
+            timeRemaining: Int,
+            streak: Int,
+            selectedCell: Cell? = null,
+            coinsEarned: Int = 0,
+            coinDetails: String = ""
+        ): GameState {
+            return GameState(
+                board = session.board,
+                selectedCell = selectedCell,
+                timeRemaining = timeRemaining,
+                score = session.score,
+                comboMultiplier = session.comboMultiplier,
+                mistakes = session.mistakes,
+                maxMistakes = session.maxMistakes,
+                isGameOver = session.isGameOver,
+                isVictory = session.isVictory,
+                currentDifficulty = session.difficulty,
+                currentSize = session.board.size,
+                streak = streak,
+                coinsEarned = coinsEarned,
+                coinDetails = coinDetails
+            )
+        }
+    }
+}
 
 class GameViewModel(
     private val preferencesRepository: UserPreferencesRepository,
-    private val gameRecordDao: GameRecordDao
+    private val gameRecordDao: GameRecordDao,
+    private val startNewGameUseCase: StartNewGameUseCase = StartNewGameUseCase(),
+    private val nextLevelUseCase: NextLevelUseCase = NextLevelUseCase(),
+    private val inputNumberUseCase: InputNumberUseCase = InputNumberUseCase(),
+    private val useHintUseCase: UseHintUseCase = UseHintUseCase(),
+    private val undoMistakeUseCase: UndoMistakeUseCase = UndoMistakeUseCase()
 ) : ViewModel() {
 
     private val _gameState = MutableStateFlow(GameState())
     val gameState: StateFlow<GameState> = _gameState.asStateFlow()
 
     val coins: StateFlow<Int> = preferencesRepository.coinsFlow.stateIn(
-            viewModelScope,
-            SharingStarted.WhileSubscribed(5000),
-            0
-        )
+        viewModelScope,
+        SharingStarted.Eagerly,
+        0
+    )
 
-    val highScore: StateFlow<Int> = preferencesRepository.highScoreFlow.stateIn(
-            viewModelScope,
-            SharingStarted.WhileSubscribed(5000),
-            0
-        )
-
-    val bestStreak: StateFlow<Int> = preferencesRepository.bestStreakFlow.stateIn(
-            viewModelScope,
-            SharingStarted.WhileSubscribed(5000),
-            0
-        )
 
     private var timerJob: Job? = null
 
@@ -68,29 +112,32 @@ class GameViewModel(
         startNewGame(4, Difficulty.EASY)
     }
 
+    fun setPreviewState(state: GameState) {
+        _gameState.value = state
+    }
+
     fun startNewGame(size: Int, difficulty: Difficulty) {
-        val startingTime = when (size) {
-            4 -> 60
-            6 -> 180
-            9 -> 300
-            else -> 180
+        _gameState.update {
+            it.copy(
+                board = null,
+                selectedCell = null,
+                score = 0,
+                comboMultiplier = 0,
+                mistakes = 0,
+                isGameOver = false,
+                isVictory = false,
+                streak = 0,
+                coinsEarned = 0,
+                coinDetails = ""
+            )
         }
 
         viewModelScope.launch(Dispatchers.Default) {
-            val board = SudokuEngine.generateBoard(size, difficulty)
-
+            val result = startNewGameUseCase.execute(size, difficulty)
             _gameState.update {
-                it.copy(
-                    board = board,
-                    selectedCell = null,
-                    timeRemaining = startingTime,
-                    score = 0,
-                    comboMultiplier = 1,
-                    mistakes = 0,
-                    isGameOver = false,
-                    isVictory = false,
-                    currentDifficulty = difficulty,
-                    currentSize = size,
+                GameState.fromSession(
+                    session = result.session,
+                    timeRemaining = result.initialTimeSeconds,
                     streak = 0
                 )
             }
@@ -100,28 +147,31 @@ class GameViewModel(
 
     fun nextLevel() {
         val state = _gameState.value
-        val newSize = state.currentSize
-        val newDifficulty = state.currentDifficulty
+        val currentSize = state.currentSize
+        val currentDifficulty = state.currentDifficulty
 
-        val startingTime = when (newSize) {
-            4 -> 60
-            6 -> 180
-            9 -> 300
-            else -> 180
+        _gameState.update {
+            it.copy(
+                board = null,
+                selectedCell = null,
+                score = 0,
+                comboMultiplier = 0,
+                mistakes = 0,
+                isGameOver = false,
+                isVictory = false,
+                coinsEarned = 0,
+                coinDetails = ""
+            )
         }
 
         viewModelScope.launch(Dispatchers.Default) {
-            val board = SudokuEngine.generateBoard(newSize, newDifficulty)
+            val result = nextLevelUseCase.execute(currentSize, currentDifficulty)
             _gameState.update {
-                it.copy(
-                    board = board,
-                    selectedCell = null,
-                    timeRemaining = it.timeRemaining + startingTime / 2,
-                    isGameOver = false,
-                    isVictory = false,
-                    currentDifficulty = newDifficulty,
-                    currentSize = newSize,
-                    streak = it.streak + 1
+                GameState.fromSession(
+                    session = result.session,
+                    timeRemaining = it.timeRemaining + result.addedTimeSeconds,
+                    streak = it.streak,
+                    selectedCell = null
                 )
             }
             startTimer()
@@ -133,15 +183,14 @@ class GameViewModel(
         timerJob = viewModelScope.launch {
             while (true) {
                 delay(1000)
-                _gameState.update {
-                    if (it.timeRemaining > 0 && !it.isGameOver) {
-                        it.copy(timeRemaining = it.timeRemaining - 1)
-                    } else if (it.timeRemaining <= 0 && !it.isGameOver) {
-                        endGame(false)
-                        it
-                    } else {
-                        it
-                    }
+                val state = _gameState.value
+                if (state.isGameOver) break
+
+                if (state.timeRemaining > 0) {
+                    _gameState.update { it.copy(timeRemaining = it.timeRemaining - 1) }
+                } else {
+                    endGame(victory = false)
+                    break
                 }
             }
         }
@@ -149,7 +198,7 @@ class GameViewModel(
 
     fun selectCell(row: Int, col: Int) {
         val state = _gameState.value
-        if (state.isGameOver || state.board == null) return
+        if (state.isGameOver || (state.board == null)) return
 
         val cell = state.board.getCell(row, col)
         if (!cell.isGiven) {
@@ -159,53 +208,39 @@ class GameViewModel(
 
     fun inputNumber(number: Int) {
         val state = _gameState.value
-        if (state.isGameOver || state.board == null) return
+        val session = state.toSession() ?: return
         val cell = state.selectedCell ?: return
+        if (state.isGameOver) return
 
-        if (cell.isGiven) return
-
-        val isCorrect = number == cell.correctValue
-
-        val newBoard = state.board.updateCell(cell.row, cell.col) {
-            it.copy(value = number, isError = !isCorrect)
+        val nextSession = inputNumberUseCase.execute(session, cell.row, cell.col, number)
+        _gameState.update {
+            GameState.fromSession(
+                session = nextSession,
+                timeRemaining = it.timeRemaining,
+                streak = it.streak,
+                selectedCell = it.selectedCell
+            )
         }
 
-        if (isCorrect) {
-            val points = 10 * state.comboMultiplier
-            _gameState.update {
-                it.copy(
-                    board = newBoard,
-                    score = it.score + points,
-                    comboMultiplier = minOf(it.comboMultiplier + 1, 5)
-                )
-            }
-            checkVictory(newBoard)
-        } else {
-            _gameState.update {
-                it.copy(
-                    board = newBoard, comboMultiplier = 1, mistakes = it.mistakes + 1
-                )
-            }
-            if (_gameState.value.mistakes >= _gameState.value.maxMistakes) {
-                endGame(false)
-            }
-        }
-    }
-
-    private fun checkVictory(board: Board) {
-        if (board.isSolved()) {
-            endGame(true)
+        if (nextSession.isGameOver) {
+            endGame(nextSession.isVictory)
         }
     }
 
     private fun endGame(victory: Boolean) {
         timerJob?.cancel()
-        _gameState.update { it.copy(isGameOver = true, isVictory = victory) }
+
+        _gameState.update {
+            it.copy(
+                isGameOver = true,
+                isVictory = victory,
+                streak = if (victory) it.streak + 1 else 0
+            )
+        }
 
         viewModelScope.launch {
             val state = _gameState.value
 
-            // Save to history
             gameRecordDao.insertRecord(
                 GameRecord(
                     score = state.score,
@@ -216,11 +251,19 @@ class GameViewModel(
             )
 
             if (victory) {
-                val coinsEarned = 10 + (state.timeRemaining / 10) + (state.currentSize)
-                preferencesRepository.updateCoins(coinsEarned)
-                preferencesRepository.updateBestStreak(state.streak + 1)
-            } else {
-                _gameState.update { it.copy(streak = 0) }
+                val reward = CoinRewardPolicy.forVictory(
+                    timeRemaining = state.timeRemaining,
+                    boardSize = state.currentSize
+                )
+
+                _gameState.update {
+                    it.copy(
+                        coinsEarned = reward.totalCoins,
+                        coinDetails = reward.details
+                    )
+                }
+                preferencesRepository.updateCoins(reward.totalCoins)
+                preferencesRepository.updateBestStreak(state.streak)
             }
             preferencesRepository.updateHighScore(state.score)
         }
@@ -239,18 +282,24 @@ class GameViewModel(
     fun useHint() {
         val cost = 30
         val state = _gameState.value
-        val board = state.board ?: return
+        val session = state.toSession() ?: return
 
         if (coins.value >= cost && !state.isGameOver) {
             viewModelScope.launch {
-                val targetCell = board.cells.flatten().find { it.isEmpty || it.isError }
-                if (targetCell != null) {
-                    preferencesRepository.updateCoins(-cost)
-                    val newBoard = board.updateCell(targetCell.row, targetCell.col) {
-                        it.copy(value = it.correctValue, isError = false)
-                    }
-                    _gameState.update { it.copy(board = newBoard) }
-                    checkVictory(newBoard)
+                val nextSession = useHintUseCase.execute(session)
+                if (nextSession == session) return@launch
+
+                preferencesRepository.updateCoins(-cost)
+                _gameState.update {
+                    GameState.fromSession(
+                        session = nextSession,
+                        timeRemaining = it.timeRemaining,
+                        streak = it.streak,
+                        selectedCell = it.selectedCell
+                    )
+                }
+                if (nextSession.isGameOver) {
+                    endGame(nextSession.isVictory)
                 }
             }
         }
@@ -259,21 +308,21 @@ class GameViewModel(
     fun undoMistake() {
         val cost = 15
         val state = _gameState.value
-        val board = state.board ?: return
+        val session = state.toSession() ?: return
 
         if (coins.value >= cost && !state.isGameOver && state.mistakes > 0) {
             viewModelScope.launch {
-                val targetCell = board.cells.flatten().lastOrNull { it.isError }
-                if (targetCell != null) {
-                    preferencesRepository.updateCoins(-cost)
-                    val newBoard = board.updateCell(targetCell.row, targetCell.col) {
-                        it.copy(value = 0, isError = false)
-                    }
-                    _gameState.update {
-                        it.copy(
-                            board = newBoard, mistakes = it.mistakes - 1
-                        )
-                    }
+                val nextSession = undoMistakeUseCase.execute(session)
+                if (nextSession == session) return@launch
+
+                preferencesRepository.updateCoins(-cost)
+                _gameState.update {
+                    GameState.fromSession(
+                        session = nextSession,
+                        timeRemaining = it.timeRemaining,
+                        streak = it.streak,
+                        selectedCell = it.selectedCell
+                    )
                 }
             }
         }

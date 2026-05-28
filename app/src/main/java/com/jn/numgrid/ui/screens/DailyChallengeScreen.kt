@@ -18,16 +18,16 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.jn.numgrid.audio.SoundManager
-import com.jn.numgrid.model.Difficulty
+import com.jn.numgrid.domain.game.Difficulty
 import com.jn.numgrid.ui.components.NeonButton
 import com.jn.numgrid.ui.components.NeonText
 import com.jn.numgrid.ui.components.NeonTitle
 import com.jn.numgrid.ui.theme.DarkBackground
-import com.jn.numgrid.ui.theme.NeonYellow
-import androidx.compose.ui.tooling.preview.Preview
 import com.jn.numgrid.ui.theme.GameTheme
+import com.jn.numgrid.ui.theme.NeonYellow
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

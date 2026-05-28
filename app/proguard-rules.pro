@@ -17,7 +17,7 @@
 # DataStore
 
 # Retrofit
--keepattributes Signature, InnerClasses, AnnotationDefault
+-keepattributes Signature, InnerClasses, AnnotationDefault, Metadata
 -keepattributes RuntimeVisibleAnnotations, RuntimeVisibleParameterAnnotations
 -keepattributes RuntimeVisibleTypeAnnotations, AnnotationDefault
 -keepclassmembernames interface * {
@@ -49,7 +49,7 @@
 
 
 # Game Models (Keep for persistence/serialization)
--keep class com.jn.numgrid.model.** { *; }
+-keep class com.jn.numgrid.domain.game.** { *; }
 
 # Kotlin Coroutines
 -keepnames class kotlinx.coroutines.internal.MainDispatcherFactory {}

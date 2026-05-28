@@ -8,7 +8,6 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.jn.numgrid.audio.HapticManager
 import com.jn.numgrid.audio.SoundManager
 import com.jn.numgrid.data.GameRecordDao
 import com.jn.numgrid.data.UserPreferencesRepository
@@ -31,8 +30,7 @@ fun GameApplication(
     repository: UserPreferencesRepository,
     gameRecordDao: GameRecordDao,
     application: Application,
-    soundManager: SoundManager,
-    hapticManager: HapticManager
+    soundManager: SoundManager
 ) {
     val navController = rememberNavController()
     val gameViewModel: GameViewModel = viewModel(
@@ -129,7 +127,6 @@ fun GameApplication(
             GameScreen(
                 viewModel = gameViewModel,
                 soundManager = soundManager,
-                hapticManager = hapticManager,
                 onNavigateToResult = {
                     navController.navigate(Screen.Result.route) {
                         popUpTo(Screen.Game.route) { inclusive = true }
@@ -138,22 +135,29 @@ fun GameApplication(
         }
 
         composable(Screen.Result.route) {
-            ResultScreen(gameState = gameState, onPlayAgain = {
-                soundManager.playTap()
-                if (gameState.isVictory) {
+            ResultScreen(
+                gameState = gameState,
+                onNextLevel = {
+                    soundManager.playTap()
                     gameViewModel.nextLevel()
-                } else {
+                    navController.navigate(Screen.Game.route) {
+                        popUpTo(Screen.Result.route) { inclusive = true }
+                    }
+                },
+                onPlayAgain = {
+                    soundManager.playTap()
                     gameViewModel.startNewGame(
                         gameState.currentSize, gameState.currentDifficulty
                     )
+                    navController.navigate(Screen.Game.route) {
+                        popUpTo(Screen.Result.route) { inclusive = true }
+                    }
+                },
+                onHome = {
+                    soundManager.playTap()
+                    navigateHomeAsRoot()
                 }
-                navController.navigate(Screen.Game.route) {
-                    popUpTo(Screen.Result.route) { inclusive = true }
-                }
-            }, onHome = {
-                soundManager.playTap()
-                navigateHomeAsRoot()
-            })
+            )
         }
 
         composable(Screen.Shop.route) {

@@ -45,7 +45,8 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.jn.numgrid.billing.StoreProduct
+import com.jn.numgrid.domain.shop.ShopProduct
+import com.jn.numgrid.domain.shop.ShopStatus
 import com.jn.numgrid.ui.components.NeonText
 import com.jn.numgrid.ui.components.RetroFont
 import com.jn.numgrid.ui.theme.CoinGold
@@ -63,21 +64,28 @@ fun ShopScreen(
 ) {
     val products by viewModel.products.collectAsState()
     val coins by viewModel.coins.collectAsState()
+    val status by viewModel.status.collectAsState()
 
     ShopContent(
-        products = products, coins = coins, onBack = onBack, onBuyProduct = { product, activity ->
+        products = products,
+        coins = coins,
+        status = status,
+        onBack = onBack,
+        onBuyProduct = { product, activity ->
             viewModel.buyProduct(activity, product)
-        }, modifier = modifier
+        },
+        modifier = modifier
     )
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ShopContent(
-    products: List<StoreProduct>,
+    products: List<ShopProduct>,
     coins: Int,
+    status: ShopStatus,
     onBack: () -> Unit,
-    onBuyProduct: (StoreProduct, android.app.Activity) -> Unit,
+    onBuyProduct: (ShopProduct, android.app.Activity) -> Unit,
     modifier: Modifier = Modifier
 ) {
     val activity = LocalActivity.current
@@ -132,8 +140,14 @@ fun ShopContent(
         ) {
             if (products.isEmpty()) {
                 Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                    val message = when (status) {
+                        ShopStatus.CONNECTING -> "Connecting to Store..."
+                        ShopStatus.ERROR -> "Store Unavailable"
+                        ShopStatus.EMPTY -> "No products found"
+                        else -> "Loading store items..."
+                    }
                     NeonText(
-                        text = "Loading store items...",
+                        text = message,
                         color = Color.White.copy(alpha = 0.6f),
                         fontSize = 16
                     )
@@ -160,7 +174,7 @@ fun ShopContent(
 
 @Composable
 fun ProductItem(
-    product: StoreProduct, onPurchaseClick: () -> Unit, modifier: Modifier = Modifier
+    product: ShopProduct, onPurchaseClick: () -> Unit, modifier: Modifier = Modifier
 ) {
     val price = product.price
     val coinsAmount = product.coinAmount
@@ -219,7 +233,7 @@ fun ProductItem(
                 contentPadding = PaddingValues(horizontal = 4.dp, vertical = 8.dp)
             ) {
                 Text(
-                    text = price,
+                    text = price ?: "Unknown",
                     color = DarkBackground,
                     fontWeight = FontWeight.Bold,
                     textAlign = TextAlign.Center,
@@ -235,11 +249,51 @@ fun ProductItem(
 
 @Preview(showBackground = true)
 @Composable
-fun ShopScreenPreview() {
+fun ShopScreenConnectedPreview() {
     GameTheme {
         ShopContent(
             products = PreviewData.mockProducts,
             coins = 500,
+            status = ShopStatus.CONNECTED,
+            onBack = {},
+            onBuyProduct = { _, _ -> })
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun ShopScreenConnectingPreview() {
+    GameTheme {
+        ShopContent(
+            products = emptyList(),
+            coins = 500,
+            status = ShopStatus.CONNECTING,
+            onBack = {},
+            onBuyProduct = { _, _ -> })
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun ShopScreenErrorPreview() {
+    GameTheme {
+        ShopContent(
+            products = emptyList(),
+            coins = 500,
+            status = ShopStatus.ERROR,
+            onBack = {},
+            onBuyProduct = { _, _ -> })
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun ShopScreenEmptyPreview() {
+    GameTheme {
+        ShopContent(
+            products = emptyList(),
+            coins = 500,
+            status = ShopStatus.EMPTY,
             onBack = {},
             onBuyProduct = { _, _ -> })
     }

@@ -79,16 +79,14 @@ fun NeonTitle(
     resId: Int, color: Color, modifier: Modifier = Modifier, fontSize: Int = 48
 ) {
     NeonTitle(
-        text = stringResource(id = resId),
-        color = color,
-        modifier = modifier,
-        fontSize = fontSize
+        text = stringResource(id = resId), color = color, modifier = modifier, fontSize = fontSize
     )
 }
 
 @Composable
 fun NeonTitle(
-    text: String, color: Color, modifier: Modifier = Modifier, fontSize: Int = 48
+    text: String, color: Color, modifier: Modifier = Modifier, fontSize: Int = 48,
+    textAlign: TextAlign = TextAlign.Center,
 ) {
     Text(
         text = text,
@@ -101,7 +99,8 @@ fun NeonTitle(
             shadow = Shadow(
                 color = color, blurRadius = 16f
             )
-        )
+        ),
+        textAlign = textAlign
     )
 }
 

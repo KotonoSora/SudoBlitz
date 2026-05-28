@@ -27,24 +27,25 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalLocale
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.jn.numgrid.data.GameRecord
 import com.jn.numgrid.ui.components.NeonText
 import com.jn.numgrid.ui.components.NeonTitle
 import com.jn.numgrid.ui.theme.DarkBackground
+import com.jn.numgrid.ui.theme.GameTheme
 import com.jn.numgrid.ui.theme.NeonBlue
 import com.jn.numgrid.ui.theme.NeonCyan
 import com.jn.numgrid.ui.theme.NeonMagenta
 import com.jn.numgrid.ui.theme.NeonYellow
 import com.jn.numgrid.ui.theme.SurfaceDark
-import androidx.compose.ui.tooling.preview.Preview
-import com.jn.numgrid.ui.theme.GameTheme
 import com.jn.numgrid.viewmodel.ProgressViewModel
 import java.text.NumberFormat
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
-import androidx.compose.ui.platform.LocalLocale
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -90,21 +91,23 @@ fun ProgressScreen(
                     .padding(bottom = 24.dp)
             ) {
                 Column(
-                    modifier = Modifier.padding(16.dp),
+                    modifier = Modifier.padding(horizontal = 8.dp, vertical = 16.dp),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     NeonText("PERSONAL RECORDS", NeonYellow, fontSize = 14)
-                    Spacer(modifier = Modifier.height(8.dp))
+                    Spacer(modifier = Modifier.height(10.dp))
                     Row(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.SpaceEvenly
                     ) {
                         Column(horizontalAlignment = Alignment.CenterHorizontally) {
                             NeonText("BEST SCORE", NeonCyan, fontSize = 12)
+                            Spacer(modifier = Modifier.height(10.dp))
                             NeonText(numberFormat.format(highScore), NeonCyan, fontSize = 24)
                         }
                         Column(horizontalAlignment = Alignment.CenterHorizontally) {
                             NeonText("LONG STREAK", NeonMagenta, fontSize = 12)
+                            Spacer(modifier = Modifier.height(10.dp))
                             NeonText(bestStreak.toString(), NeonMagenta, fontSize = 24)
                         }
                     }
@@ -127,9 +130,21 @@ fun ProgressScreen(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.SpaceBetween
                     ) {
-                        NeonText("DATE", NeonBlue, fontSize = 12, modifier = Modifier.weight(1.5f))
-                        NeonText("DIFF", NeonBlue, fontSize = 12, modifier = Modifier.weight(1f))
-                        NeonText("SCORE", NeonBlue, fontSize = 12, modifier = Modifier.weight(1f))
+                        NeonText("DATE", NeonBlue, fontSize = 12, modifier = Modifier.weight(1f))
+                        NeonText(
+                            "DIFF",
+                            NeonBlue,
+                            fontSize = 12,
+                            modifier = Modifier.weight(1f),
+                            textAlign = TextAlign.Center,
+                        )
+                        NeonText(
+                            "SCORE",
+                            NeonBlue,
+                            fontSize = 12,
+                            modifier = Modifier.weight(1f),
+                            textAlign = TextAlign.End,
+                        )
                     }
                     HorizontalDivider(
                         color = NeonBlue, modifier = Modifier.padding(vertical = 8.dp)
@@ -148,7 +163,7 @@ fun ProgressScreen(
 
 @Composable
 fun HistoryRow(record: GameRecord) {
-    val dateFormat = SimpleDateFormat("MMM dd, HH:mm", LocalLocale.current.platformLocale)
+    val dateFormat = SimpleDateFormat("yyyy/MM/dd\nHH:mm", LocalLocale.current.platformLocale)
     val dateStr = dateFormat.format(Date(record.timestamp))
     val numberFormat = NumberFormat.getNumberInstance(Locale.US)
 
@@ -159,13 +174,20 @@ fun HistoryRow(record: GameRecord) {
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
-        NeonText(dateStr, Color.White, fontSize = 12, modifier = Modifier.weight(1.5f))
-        NeonText(record.difficulty.take(4), NeonCyan, fontSize = 12, modifier = Modifier.weight(1f))
+        NeonText(dateStr, Color.White, fontSize = 10, modifier = Modifier.weight(1f))
+        NeonText(
+            record.difficulty.take(4),
+            NeonCyan,
+            fontSize = 10,
+            modifier = Modifier.weight(1f),
+            textAlign = TextAlign.Center,
+        )
         NeonText(
             numberFormat.format(record.score),
             NeonMagenta,
-            fontSize = 14,
-            modifier = Modifier.weight(1f)
+            fontSize = 10,
+            modifier = Modifier.weight(1f),
+            textAlign = TextAlign.End,
         )
     }
 }
@@ -175,8 +197,6 @@ fun HistoryRow(record: GameRecord) {
 fun ProgressScreenPreview() {
     GameTheme {
         ProgressScreen(
-            viewModel = rememberPreviewProgressViewModel(),
-            onBack = {}
-        )
+            viewModel = rememberPreviewProgressViewModel(), onBack = {})
     }
 }

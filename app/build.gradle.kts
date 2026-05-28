@@ -17,7 +17,6 @@ configure<ApplicationExtension> {
     defaultConfig {
         applicationId = "com.jn.numgrid"
         minSdk = 24
-        targetSdk = 36
         versionCode = 1
         versionName = "1.0.0"
 
@@ -66,7 +65,6 @@ dependencies {
     implementation(libs.kotlinx.coroutines.android)
     implementation(libs.kotlinx.coroutines.core)
     implementation(libs.accompanist.permissions)
-    implementation(libs.play.services.location)
     implementation(libs.logging.interceptor)
     implementation(libs.okhttp)
     implementation(libs.moshi.kotlin)

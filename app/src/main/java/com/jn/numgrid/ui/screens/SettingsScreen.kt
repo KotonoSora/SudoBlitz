@@ -18,7 +18,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.ArrowBack
 import androidx.compose.material.icons.automirrored.rounded.VolumeUp
 import androidx.compose.material.icons.rounded.MusicNote
-import androidx.compose.material.icons.rounded.Vibration
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -42,7 +41,6 @@ import com.jn.numgrid.ui.components.NeonTitle
 import com.jn.numgrid.ui.theme.DarkBackground
 import com.jn.numgrid.ui.theme.GameTheme
 import com.jn.numgrid.ui.theme.NeonCyan
-import com.jn.numgrid.ui.theme.NeonGreen
 import com.jn.numgrid.ui.theme.NeonMagenta
 import com.jn.numgrid.ui.theme.NeonYellow
 import com.jn.numgrid.viewmodel.SettingsViewModel
@@ -52,9 +50,7 @@ import com.jn.numgrid.viewmodel.SettingsViewModel
 fun SettingsScreen(
     viewModel: SettingsViewModel, onBack: () -> Unit, modifier: Modifier = Modifier
 ) {
-    val soundEnabled by viewModel.soundEnabled.collectAsState()
-    val musicEnabled by viewModel.musicEnabled.collectAsState()
-    val hapticEnabled by viewModel.hapticEnabled.collectAsState()
+    val settings by viewModel.settings.collectAsState()
 
     Scaffold(
         topBar = {
@@ -88,7 +84,7 @@ fun SettingsScreen(
                 label = "SOUND",
                 icon = Icons.AutoMirrored.Rounded.VolumeUp,
                 color = NeonCyan,
-                checked = soundEnabled,
+                checked = settings.soundEnabled,
                 onCheckedChange = { viewModel.toggleSound(it) })
 
             Spacer(modifier = Modifier.height(20.dp))
@@ -97,17 +93,8 @@ fun SettingsScreen(
                 label = "MUSIC",
                 icon = Icons.Rounded.MusicNote,
                 color = NeonYellow,
-                checked = musicEnabled,
+                checked = settings.musicEnabled,
                 onCheckedChange = { viewModel.toggleMusic(it) })
-
-            Spacer(modifier = Modifier.height(20.dp))
-
-            SettingToggle(
-                label = "HAPTIC",
-                icon = Icons.Rounded.Vibration,
-                color = NeonGreen,
-                checked = hapticEnabled,
-                onCheckedChange = { viewModel.toggleHaptic(it) })
         }
     }
 }
