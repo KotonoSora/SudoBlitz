@@ -26,14 +26,16 @@ data class GameState(
     val selectedCell: Cell? = null,
     val timeRemaining: Int = 180, // 3 minutes
     val score: Int = 0,
-    val comboMultiplier: Int = 1,
+    val comboMultiplier: Int = 0,
     val mistakes: Int = 0,
     val maxMistakes: Int = 3,
     val isGameOver: Boolean = false,
     val isVictory: Boolean = false,
     val currentDifficulty: Difficulty = Difficulty.EASY,
     val currentSize: Int = 4,
-    val streak: Int = 0
+    val streak: Int = 0,
+    val coinsEarned: Int = 0,
+    val coinDetails: String = ""
 )
 
 class GameViewModel(
@@ -68,12 +70,29 @@ class GameViewModel(
         startNewGame(4, Difficulty.EASY)
     }
 
+    fun setPreviewState(state: GameState) {
+        _gameState.value = state
+    }
+
     fun startNewGame(size: Int, difficulty: Difficulty) {
         val startingTime = when (size) {
             4 -> 60
             6 -> 180
             9 -> 300
             else -> 180
+        }
+
+        // Reset state immediately (except for scores/streak if continuing, but here it's a new game)
+        _gameState.update {
+            it.copy(
+                isGameOver = false,
+                isVictory = false,
+                board = null,
+                score = 0,
+                comboMultiplier = 0,
+                mistakes = 0,
+                streak = 0
+            )
         }
 
         viewModelScope.launch(Dispatchers.Default) {
@@ -84,14 +103,8 @@ class GameViewModel(
                     board = board,
                     selectedCell = null,
                     timeRemaining = startingTime,
-                    score = 0,
-                    comboMultiplier = 1,
-                    mistakes = 0,
-                    isGameOver = false,
-                    isVictory = false,
                     currentDifficulty = difficulty,
-                    currentSize = size,
-                    streak = 0
+                    currentSize = size
                 )
             }
             startTimer()
@@ -110,6 +123,17 @@ class GameViewModel(
             else -> 180
         }
 
+        // Reset state immediately to clear game over flags and old board
+        _gameState.update {
+            it.copy(
+                isGameOver = false,
+                isVictory = false,
+                board = null,
+                mistakes = 0,
+                comboMultiplier = 0
+            )
+        }
+
         viewModelScope.launch(Dispatchers.Default) {
             val board = SudokuEngine.generateBoard(newSize, newDifficulty)
             _gameState.update {
@@ -117,11 +141,8 @@ class GameViewModel(
                     board = board,
                     selectedCell = null,
                     timeRemaining = it.timeRemaining + startingTime / 2,
-                    isGameOver = false,
-                    isVictory = false,
                     currentDifficulty = newDifficulty,
-                    currentSize = newSize,
-                    streak = it.streak + 1
+                    currentSize = newSize
                 )
             }
             startTimer()
@@ -171,19 +192,20 @@ class GameViewModel(
         }
 
         if (isCorrect) {
-            val points = 10 * state.comboMultiplier
             _gameState.update {
+                val nextMultiplier = minOf(it.comboMultiplier + 1, 5)
+                val points = 10 * nextMultiplier
                 it.copy(
                     board = newBoard,
                     score = it.score + points,
-                    comboMultiplier = minOf(it.comboMultiplier + 1, 5)
+                    comboMultiplier = nextMultiplier
                 )
             }
             checkVictory(newBoard)
         } else {
             _gameState.update {
                 it.copy(
-                    board = newBoard, comboMultiplier = 1, mistakes = it.mistakes + 1
+                    board = newBoard, comboMultiplier = 0, mistakes = it.mistakes + 1
                 )
             }
             if (_gameState.value.mistakes >= _gameState.value.maxMistakes) {
@@ -200,7 +222,13 @@ class GameViewModel(
 
     private fun endGame(victory: Boolean) {
         timerJob?.cancel()
-        _gameState.update { it.copy(isGameOver = true, isVictory = victory) }
+        _gameState.update {
+            it.copy(
+                isGameOver = true,
+                isVictory = victory,
+                streak = if (victory) it.streak + 1 else 0
+            )
+        }
 
         viewModelScope.launch {
             val state = _gameState.value
@@ -216,7 +244,13 @@ class GameViewModel(
             )
 
             if (victory) {
-                val coinsEarned = 10 + (state.timeRemaining / 10) + (state.currentSize)
+                val base = 10
+                val timeBonus = state.timeRemaining / 10
+                val sizeBonus = state.currentSize
+                val coinsEarned = base + timeBonus + sizeBonus
+                val details = "Base: $base, Time: +$timeBonus, Size: +$sizeBonus"
+                
+                _gameState.update { it.copy(coinsEarned = coinsEarned, coinDetails = details) }
                 preferencesRepository.updateCoins(coinsEarned)
                 preferencesRepository.updateBestStreak(state.streak + 1)
             } else {

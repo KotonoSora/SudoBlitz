@@ -36,42 +36,40 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalConfiguration
-import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.platform.LocalLocale
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.jn.numgrid.audio.HapticManager
 import com.jn.numgrid.audio.SoundManager
 import com.jn.numgrid.ui.components.NeonText
 import com.jn.numgrid.ui.components.Numpad
 import com.jn.numgrid.ui.components.SudokuGrid
 import com.jn.numgrid.ui.theme.ErrorRed
-import androidx.compose.ui.tooling.preview.Preview
 import com.jn.numgrid.ui.theme.GameTheme
 import com.jn.numgrid.ui.theme.NeonCyan
+import com.jn.numgrid.ui.theme.NeonGreen
 import com.jn.numgrid.ui.theme.NeonYellow
 import com.jn.numgrid.viewmodel.GameState
 import com.jn.numgrid.viewmodel.GameViewModel
-import java.util.Locale
-import androidx.compose.ui.platform.LocalLocale
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun GameScreen(
     viewModel: GameViewModel,
     soundManager: SoundManager,
-    hapticManager: HapticManager,
     onNavigateToResult: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     val gameState by viewModel.gameState.collectAsState()
     val coins by viewModel.coins.collectAsState()
 
-    LaunchedEffect(gameState.isGameOver) {
-        if (gameState.isGameOver) {
+    // Ensure we only navigate to result if the game was actually in progress
+    // and then reached a game over state.
+    LaunchedEffect(gameState.isGameOver, gameState.board) {
+        if (gameState.isGameOver && gameState.board != null) {
             if (gameState.isVictory) {
                 soundManager.playWin()
             } else {
                 soundManager.playLose()
-                hapticManager.vibrate()
             }
             onNavigateToResult()
         }
@@ -81,7 +79,6 @@ fun GameScreen(
     LaunchedEffect(gameState.mistakes) {
         if (gameState.mistakes > previousMistakes) {
             soundManager.playError()
-            hapticManager.vibrate()
             previousMistakes = gameState.mistakes
         }
     }
@@ -113,6 +110,7 @@ fun GameScreen(
         ) {
             GameStatsHeader(
                 gameState = gameState,
+                coins = coins,
                 modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
             )
 
@@ -178,52 +176,62 @@ fun GameScreen(
 
 @SuppressLint("NonObservableLocale")
 @Composable
-fun GameStatsHeader(gameState: GameState, modifier: Modifier = Modifier) {
-    Row(
-        modifier = modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.SpaceBetween,
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        val minutes = gameState.timeRemaining / 60
-        val seconds = gameState.timeRemaining % 60
-        val locale = LocalConfiguration.current.locales[0] ?: LocalLocale.current.platformLocale
-        val timeStr = String.format(locale, "%02d:%02d", minutes, seconds)
-
-        // Timer Section
-        Box(modifier = Modifier.weight(1f), contentAlignment = Alignment.CenterStart) {
-            NeonText(
-                text = timeStr,
-                color = if (gameState.timeRemaining < 10) ErrorRed else NeonCyan,
-                fontSize = 24
-            )
-        }
-
-        // Combo Section - multiline to prevent UI overlay
-        Box(modifier = Modifier.weight(1f), contentAlignment = Alignment.Center) {
-            if (gameState.comboMultiplier > 1) {
-                NeonText(
-                    text = "x${gameState.comboMultiplier}\nCOMBO",
-                    color = NeonYellow,
-                    fontSize = 12,
-                    textAlign = TextAlign.Center
-                )
-            }
-        }
-
-        // Mistakes Section
+fun GameStatsHeader(gameState: GameState, coins: Int, modifier: Modifier = Modifier) {
+    Column(modifier = modifier.fillMaxWidth()) {
         Row(
-            modifier = Modifier.weight(1f),
-            horizontalArrangement = Arrangement.End,
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            for (i in 1..gameState.maxMistakes) {
+            val minutes = gameState.timeRemaining / 60
+            val seconds = gameState.timeRemaining % 60
+            val locale = LocalConfiguration.current.locales[0] ?: LocalLocale.current.platformLocale
+            val timeStr = String.format(locale, "%02d:%02d", minutes, seconds)
+
+            // Timer Section
+            Box(modifier = Modifier.weight(1f), contentAlignment = Alignment.CenterStart) {
                 NeonText(
-                    text = "X",
-                    color = if (i <= gameState.mistakes) ErrorRed else Color.DarkGray,
-                    fontSize = 20,
-                    modifier = Modifier.padding(horizontal = 2.dp)
+                    text = timeStr,
+                    color = if (gameState.timeRemaining < 10) ErrorRed else NeonCyan,
+                    fontSize = 24
                 )
             }
+
+            // Mistakes Section
+            Row(
+                modifier = Modifier.weight(1f),
+                horizontalArrangement = Arrangement.End,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                for (i in 1..gameState.maxMistakes) {
+                    NeonText(
+                        text = "X",
+                        color = if (i <= gameState.mistakes) ErrorRed else Color.DarkGray,
+                        fontSize = 20,
+                        modifier = Modifier.padding(horizontal = 2.dp)
+                    )
+                }
+            }
+        }
+
+        Spacer(modifier = Modifier.height(4.dp))
+
+        // Combo & Coins Section
+        Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
+            if (gameState.comboMultiplier >= 1) {
+                NeonText(
+                    text = "x${gameState.comboMultiplier} COMBO",
+                    color = NeonGreen,
+                    fontSize = 12,
+                    modifier = Modifier.align(Alignment.CenterStart)
+                )
+            }
+            NeonText(
+                text = "$coins COINS",
+                color = NeonYellow,
+                fontSize = 12,
+                modifier = Modifier.align(Alignment.CenterEnd)
+            )
         }
     }
 }
@@ -264,8 +272,6 @@ fun GameScreenPreview() {
         GameScreen(
             viewModel = rememberPreviewGameViewModel(),
             soundManager = rememberPreviewSoundManager(),
-            hapticManager = rememberPreviewHapticManager(),
-            onNavigateToResult = {}
-        )
+            onNavigateToResult = {})
     }
 }

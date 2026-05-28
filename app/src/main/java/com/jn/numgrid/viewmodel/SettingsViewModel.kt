@@ -23,12 +23,6 @@ class SettingsViewModel(private val repository: UserPreferencesRepository) : Vie
             true
         )
 
-    val hapticEnabled: StateFlow<Boolean> = repository.hapticEnabledFlow.stateIn(
-            viewModelScope,
-            SharingStarted.WhileSubscribed(5000),
-            true
-        )
-
     fun toggleSound(enabled: Boolean) {
         viewModelScope.launch {
             repository.updateSoundEnabled(enabled)
@@ -41,11 +35,6 @@ class SettingsViewModel(private val repository: UserPreferencesRepository) : Vie
         }
     }
 
-    fun toggleHaptic(enabled: Boolean) {
-        viewModelScope.launch {
-            repository.updateHapticEnabled(enabled)
-        }
-    }
 
     companion object {
         fun provideFactory(repository: UserPreferencesRepository): ViewModelProvider.Factory =

@@ -9,7 +9,6 @@ import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.emptyPreferences
 import androidx.datastore.preferences.core.preferencesOf
-import com.jn.numgrid.audio.HapticManager
 import com.jn.numgrid.audio.SoundManager
 import com.jn.numgrid.billing.BillingManager
 import com.jn.numgrid.billing.StoreProduct
@@ -20,6 +19,9 @@ import com.jn.numgrid.viewmodel.GameViewModel
 import com.jn.numgrid.viewmodel.ProgressViewModel
 import com.jn.numgrid.viewmodel.SettingsViewModel
 import com.jn.numgrid.viewmodel.ShopViewModel
+import com.jn.numgrid.model.Difficulty
+import com.jn.numgrid.viewmodel.GameState
+import com.jn.numgrid.engine.SudokuEngine
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOf
 
@@ -58,12 +60,6 @@ fun rememberPreviewSoundManager(): SoundManager {
 }
 
 @Composable
-fun rememberPreviewHapticManager(): HapticManager {
-    val context = LocalContext.current
-    return remember(context) { HapticManager(context, PreviewData.previewRepository) }
-}
-
-@Composable
 fun rememberPreviewProgressViewModel(): ProgressViewModel {
     return remember { ProgressViewModel(PreviewData.previewRepository, PreviewData.previewGameRecordDao) }
 }
@@ -75,7 +71,20 @@ fun rememberPreviewSettingsViewModel(): SettingsViewModel {
 
 @Composable
 fun rememberPreviewGameViewModel(): GameViewModel {
-    return remember { GameViewModel(PreviewData.previewRepository, PreviewData.previewGameRecordDao) }
+    return remember {
+        GameViewModel(PreviewData.previewRepository, PreviewData.previewGameRecordDao).apply {
+            setPreviewState(
+                GameState(
+                    board = SudokuEngine.generateBoard(4, Difficulty.EASY),
+                    score = 1250,
+                    comboMultiplier = 3,
+                    mistakes = 1,
+                    timeRemaining = 45,
+                    streak = 2
+                )
+            )
+        }
+    }
 }
 
 @Composable

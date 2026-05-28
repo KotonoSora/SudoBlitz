@@ -14,7 +14,6 @@ import androidx.compose.ui.Modifier
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
-import com.jn.numgrid.audio.HapticManager
 import com.jn.numgrid.audio.SoundManager
 import com.jn.numgrid.data.AppDatabase
 import com.jn.numgrid.data.UserPreferencesRepository
@@ -52,11 +51,6 @@ class MainActivity : ComponentActivity() {
                     applicationContext, repository
                 )
             }
-            val hapticManager = remember {
-                HapticManager(
-                    applicationContext, repository
-                )
-            }
 
             DisposableEffect(Unit) {
                 onDispose { soundManager.release() }
@@ -70,8 +64,7 @@ class MainActivity : ComponentActivity() {
                         repository = repository,
                         gameRecordDao = gameRecordDao,
                         application = application as Application,
-                        soundManager = soundManager,
-                        hapticManager = hapticManager
+                        soundManager = soundManager
                     )
                 }
             }
