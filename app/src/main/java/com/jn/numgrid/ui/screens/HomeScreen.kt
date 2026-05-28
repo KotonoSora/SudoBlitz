@@ -59,28 +59,28 @@ fun HomeScreen(
         topBar = {
             TopAppBar(
                 title = { }, actions = {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier.padding(end = 16.dp)
-                ) {
-                    Icon(
-                        Icons.Rounded.MonetizationOn,
-                        contentDescription = "Coins",
-                        tint = CoinGold,
-                        modifier = Modifier.size(24.dp)
-                    )
-                    Spacer(modifier = Modifier.width(4.dp))
-                    NeonText(coins.toString(), CoinGold, fontSize = 18)
-                    Spacer(modifier = Modifier.width(16.dp))
-                    IconButton(onClick = onShopClicked) {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier.padding(end = 16.dp)
+                    ) {
                         Icon(
-                            Icons.Rounded.ShoppingCart,
-                            contentDescription = "Shop",
-                            tint = NeonCyan
+                            Icons.Rounded.MonetizationOn,
+                            contentDescription = "Coins",
+                            tint = CoinGold,
+                            modifier = Modifier.size(24.dp)
                         )
+                        Spacer(modifier = Modifier.width(4.dp))
+                        NeonText(coins.toString(), CoinGold, fontSize = 18)
+                        Spacer(modifier = Modifier.width(16.dp))
+                        IconButton(onClick = onShopClicked) {
+                            Icon(
+                                Icons.Rounded.ShoppingCart,
+                                contentDescription = "Shop",
+                                tint = NeonCyan
+                            )
+                        }
                     }
-                }
-            }, colors = TopAppBarDefaults.topAppBarColors(containerColor = Color.Transparent)
+                }, colors = TopAppBarDefaults.topAppBarColors(containerColor = Color.Transparent)
             )
         }, containerColor = DarkBackground
     ) { innerPadding ->

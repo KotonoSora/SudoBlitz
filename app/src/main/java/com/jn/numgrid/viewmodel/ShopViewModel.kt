@@ -2,54 +2,75 @@ package com.jn.numgrid.viewmodel
 
 import android.app.Activity
 import android.app.Application
-import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import com.jn.numgrid.billing.BillingManager
-import com.jn.numgrid.billing.StoreProduct
+import com.jn.numgrid.application.shop.ObserveShopProductsUseCase
+import com.jn.numgrid.application.shop.ObserveShopStatusUseCase
+import com.jn.numgrid.application.shop.PurchaseProductUseCase
+import com.jn.numgrid.application.shop.ReleaseShopUseCase
+import com.jn.numgrid.application.shop.SetMockProductsUseCase
+import com.jn.numgrid.application.shop.ShopStoreGateway
+import com.jn.numgrid.billing.BillingShopStoreGateway
+import com.jn.numgrid.data.CoinWalletGatewayAdapter
 import com.jn.numgrid.data.UserPreferencesRepository
+import com.jn.numgrid.domain.shop.CoinWalletGateway
+import com.jn.numgrid.domain.shop.ShopProduct
+import com.jn.numgrid.domain.shop.ShopStatus
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.stateIn
 
 class ShopViewModel(
-    application: Application,
-    preferencesRepository: UserPreferencesRepository,
-    isPreview: Boolean = false
-) : AndroidViewModel(application) {
+    private val observeShopProducts: ObserveShopProductsUseCase,
+    private val observeShopStatus: ObserveShopStatusUseCase,
+    private val purchaseProduct: PurchaseProductUseCase,
+    private val setMockProductsUseCase: SetMockProductsUseCase,
+    private val releaseShopUseCase: ReleaseShopUseCase,
+    walletGateway: CoinWalletGateway
+) : ViewModel() {
 
-    private val billingManager = BillingManager(application, preferencesRepository, isPreview)
-
-    fun setMockProducts(products: List<StoreProduct>) {
-        billingManager.setMockProducts(products)
+    fun setMockProducts(products: List<ShopProduct>) {
+        setMockProductsUseCase(products)
     }
 
-    val products: StateFlow<List<StoreProduct>> = billingManager.products
+    val products: StateFlow<List<ShopProduct>> = observeShopProducts()
 
-    val status = billingManager.status
+    val status: StateFlow<ShopStatus> = observeShopStatus()
 
-    val coins: StateFlow<Int> = preferencesRepository.coinsFlow.stateIn(
-        viewModelScope, SharingStarted.Eagerly, 500
+    val coins: StateFlow<Int> = walletGateway.coinsFlow.stateIn(
+        viewModelScope, SharingStarted.Eagerly, 0
     )
 
-    fun buyProduct(activity: Activity, product: StoreProduct) {
-        billingManager.launchBillingFlow(activity, product)
+    fun buyProduct(activity: Activity, product: ShopProduct) {
+        purchaseProduct(activity, product)
     }
 
     override fun onCleared() {
         super.onCleared()
-        billingManager.release()
+        releaseShopUseCase()
     }
 
     companion object {
         fun provideFactory(
-            application: Application, repository: UserPreferencesRepository
+            application: Application,
+            repository: UserPreferencesRepository,
+            isPreview: Boolean = false
         ): ViewModelProvider.Factory = object : ViewModelProvider.Factory {
             @Suppress("UNCHECKED_CAST")
             override fun <T : ViewModel> create(modelClass: Class<T>): T {
                 if (modelClass.isAssignableFrom(ShopViewModel::class.java)) {
-                    return ShopViewModel(application, repository) as T
+                    val storeGateway: ShopStoreGateway =
+                        BillingShopStoreGateway(application, repository, isPreview)
+                    val walletGateway: CoinWalletGateway = CoinWalletGatewayAdapter(repository)
+                    return ShopViewModel(
+                        observeShopProducts = ObserveShopProductsUseCase(storeGateway),
+                        observeShopStatus = ObserveShopStatusUseCase(storeGateway),
+                        purchaseProduct = PurchaseProductUseCase(storeGateway),
+                        setMockProductsUseCase = SetMockProductsUseCase(storeGateway),
+                        releaseShopUseCase = ReleaseShopUseCase(storeGateway),
+                        walletGateway = walletGateway
+                    ) as T
                 }
                 throw IllegalArgumentException("Unknown ViewModel class")
             }

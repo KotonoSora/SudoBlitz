@@ -1,4 +1,4 @@
-package com.jn.numgrid.model
+package com.jn.numgrid.domain.game
 
 data class Cell(
     val row: Int,

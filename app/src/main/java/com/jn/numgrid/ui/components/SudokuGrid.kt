@@ -16,8 +16,8 @@ import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import com.jn.numgrid.model.Board
-import com.jn.numgrid.model.Cell
+import com.jn.numgrid.domain.game.Board
+import com.jn.numgrid.domain.game.Cell
 import com.jn.numgrid.ui.theme.DarkBackground
 import com.jn.numgrid.ui.theme.ErrorRed
 import com.jn.numgrid.ui.theme.NeonBlue
@@ -30,7 +30,7 @@ fun SudokuGrid(
     board: Board,
     selectedCell: Cell?,
     onCellSelected: (Int, Int) -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     val outerBorderColor = NeonCyan
 
@@ -45,7 +45,7 @@ fun SudokuGrid(
                 row.forEachIndexed { c, cell ->
                     SudokuCellView(
                         cell = cell,
-                        isSelected = selectedCell?.row == r && selectedCell?.col == c,
+                        isSelected = (selectedCell?.row == r && selectedCell.col == c),
                         boardSize = board.size,
                         regionRows = board.regionRows,
                         regionCols = board.regionCols,

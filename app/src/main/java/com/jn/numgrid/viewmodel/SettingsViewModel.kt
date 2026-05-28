@@ -3,45 +3,54 @@ package com.jn.numgrid.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
+import com.jn.numgrid.application.settings.ObserveSettingsUseCase
+import com.jn.numgrid.application.settings.ToggleMusicUseCase
+import com.jn.numgrid.application.settings.ToggleSoundUseCase
+import com.jn.numgrid.data.SettingsPreferencesGatewayAdapter
 import com.jn.numgrid.data.UserPreferencesRepository
+import com.jn.numgrid.domain.settings.Settings
+import com.jn.numgrid.domain.settings.SettingsPreferencesGateway
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
-class SettingsViewModel(private val repository: UserPreferencesRepository) : ViewModel() {
+class SettingsViewModel(
+    private val observeSettings: ObserveSettingsUseCase,
+    private val toggleSoundUseCase: ToggleSoundUseCase,
+    private val toggleMusicUseCase: ToggleMusicUseCase
+) : ViewModel() {
 
-    val soundEnabled: StateFlow<Boolean> = repository.soundEnabledFlow.stateIn(
-            viewModelScope,
-            SharingStarted.WhileSubscribed(5000),
-            true
-        )
-
-    val musicEnabled: StateFlow<Boolean> = repository.musicEnabledFlow.stateIn(
-            viewModelScope,
-            SharingStarted.WhileSubscribed(5000),
-            true
-        )
+    val settings: StateFlow<Settings> = observeSettings().stateIn(
+        viewModelScope,
+        SharingStarted.Eagerly,
+        Settings(soundEnabled = true, musicEnabled = true)
+    )
 
     fun toggleSound(enabled: Boolean) {
         viewModelScope.launch {
-            repository.updateSoundEnabled(enabled)
+            toggleSoundUseCase(enabled)
         }
     }
 
     fun toggleMusic(enabled: Boolean) {
         viewModelScope.launch {
-            repository.updateMusicEnabled(enabled)
+            toggleMusicUseCase(enabled)
         }
     }
-
 
     companion object {
         fun provideFactory(repository: UserPreferencesRepository): ViewModelProvider.Factory =
             object : ViewModelProvider.Factory {
                 @Suppress("UNCHECKED_CAST")
                 override fun <T : ViewModel> create(modelClass: Class<T>): T {
-                    return SettingsViewModel(repository) as T
+                    val gateway: SettingsPreferencesGateway =
+                        SettingsPreferencesGatewayAdapter(repository)
+                    return SettingsViewModel(
+                        observeSettings = ObserveSettingsUseCase(gateway),
+                        toggleSoundUseCase = ToggleSoundUseCase(gateway),
+                        toggleMusicUseCase = ToggleMusicUseCase(gateway)
+                    ) as T
                 }
             }
     }

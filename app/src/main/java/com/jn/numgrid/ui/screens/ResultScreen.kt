@@ -148,13 +148,13 @@ fun ResultScreenVictoryPreview() {
     GameTheme {
         ResultScreen(
             gameState = GameState(
-            score = 2450,
-            streak = 3,
-            isVictory = true,
-            isGameOver = true,
-            coinsEarned = 45,
-            coinDetails = "Base: 10, Time: +31, Size: +4"
-        ), onNextLevel = {}, onPlayAgain = {}, onHome = {})
+                score = 2450,
+                streak = 3,
+                isVictory = true,
+                isGameOver = true,
+                coinsEarned = 45,
+                coinDetails = "Base: 10, Time: +31, Size: +4"
+            ), onNextLevel = {}, onPlayAgain = {}, onHome = {})
     }
 }
 
@@ -164,7 +164,7 @@ fun ResultScreenDefeatPreview() {
     GameTheme {
         ResultScreen(
             gameState = GameState(
-            score = 800, streak = 0, isVictory = false, isGameOver = true
-        ), onNextLevel = {}, onPlayAgain = {}, onHome = {})
+                score = 800, streak = 0, isVictory = false, isGameOver = true
+            ), onNextLevel = {}, onPlayAgain = {}, onHome = {})
     }
 }

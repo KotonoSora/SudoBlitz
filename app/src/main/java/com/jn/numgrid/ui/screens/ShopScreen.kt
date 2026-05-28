@@ -45,8 +45,8 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.jn.numgrid.billing.BillingStatus
-import com.jn.numgrid.billing.StoreProduct
+import com.jn.numgrid.domain.shop.ShopProduct
+import com.jn.numgrid.domain.shop.ShopStatus
 import com.jn.numgrid.ui.components.NeonText
 import com.jn.numgrid.ui.components.RetroFont
 import com.jn.numgrid.ui.theme.CoinGold
@@ -81,11 +81,11 @@ fun ShopScreen(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ShopContent(
-    products: List<StoreProduct>,
+    products: List<ShopProduct>,
     coins: Int,
-    status: BillingStatus,
+    status: ShopStatus,
     onBack: () -> Unit,
-    onBuyProduct: (StoreProduct, android.app.Activity) -> Unit,
+    onBuyProduct: (ShopProduct, android.app.Activity) -> Unit,
     modifier: Modifier = Modifier
 ) {
     val activity = LocalActivity.current
@@ -141,9 +141,9 @@ fun ShopContent(
             if (products.isEmpty()) {
                 Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                     val message = when (status) {
-                        BillingStatus.CONNECTING -> "Connecting to Store..."
-                        BillingStatus.ERROR -> "Store Unavailable"
-                        BillingStatus.EMPTY -> "No products found"
+                        ShopStatus.CONNECTING -> "Connecting to Store..."
+                        ShopStatus.ERROR -> "Store Unavailable"
+                        ShopStatus.EMPTY -> "No products found"
                         else -> "Loading store items..."
                     }
                     NeonText(
@@ -174,7 +174,7 @@ fun ShopContent(
 
 @Composable
 fun ProductItem(
-    product: StoreProduct, onPurchaseClick: () -> Unit, modifier: Modifier = Modifier
+    product: ShopProduct, onPurchaseClick: () -> Unit, modifier: Modifier = Modifier
 ) {
     val price = product.price
     val coinsAmount = product.coinAmount
@@ -254,7 +254,7 @@ fun ShopScreenConnectedPreview() {
         ShopContent(
             products = PreviewData.mockProducts,
             coins = 500,
-            status = BillingStatus.CONNECTED,
+            status = ShopStatus.CONNECTED,
             onBack = {},
             onBuyProduct = { _, _ -> })
     }
@@ -267,7 +267,7 @@ fun ShopScreenConnectingPreview() {
         ShopContent(
             products = emptyList(),
             coins = 500,
-            status = BillingStatus.CONNECTING,
+            status = ShopStatus.CONNECTING,
             onBack = {},
             onBuyProduct = { _, _ -> })
     }
@@ -280,7 +280,7 @@ fun ShopScreenErrorPreview() {
         ShopContent(
             products = emptyList(),
             coins = 500,
-            status = BillingStatus.ERROR,
+            status = ShopStatus.ERROR,
             onBack = {},
             onBuyProduct = { _, _ -> })
     }
@@ -293,7 +293,7 @@ fun ShopScreenEmptyPreview() {
         ShopContent(
             products = emptyList(),
             coins = 500,
-            status = BillingStatus.EMPTY,
+            status = ShopStatus.EMPTY,
             onBack = {},
             onBuyProduct = { _, _ -> })
     }

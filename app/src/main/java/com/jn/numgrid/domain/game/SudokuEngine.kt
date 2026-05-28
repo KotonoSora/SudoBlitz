@@ -1,15 +1,17 @@
-package com.jn.numgrid.engine
+package com.jn.numgrid.domain.game
 
-import com.jn.numgrid.model.Board
-import com.jn.numgrid.model.Cell
-import com.jn.numgrid.model.Difficulty
+object SudokuEngine : BoardGenerator {
 
-object SudokuEngine {
+    private val supportedSizes = setOf(4, 6, 9)
 
     /**
      * Generates a solvable Sudoku board of given size (4, 6, or 9) and difficulty.
      */
-    fun generateBoard(size: Int, difficulty: Difficulty): Board {
+    override fun generateBoard(size: Int, difficulty: Difficulty): Board {
+        require(size in supportedSizes) {
+            "Unsupported board size: $size. Supported sizes: ${supportedSizes.joinToString()}"
+        }
+
         val regionRows = when (size) {
             4 -> 2
             6 -> 2

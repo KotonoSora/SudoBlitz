@@ -41,7 +41,6 @@ import com.jn.numgrid.ui.components.NeonTitle
 import com.jn.numgrid.ui.theme.DarkBackground
 import com.jn.numgrid.ui.theme.GameTheme
 import com.jn.numgrid.ui.theme.NeonCyan
-import com.jn.numgrid.ui.theme.NeonGreen
 import com.jn.numgrid.ui.theme.NeonMagenta
 import com.jn.numgrid.ui.theme.NeonYellow
 import com.jn.numgrid.viewmodel.SettingsViewModel
@@ -51,8 +50,7 @@ import com.jn.numgrid.viewmodel.SettingsViewModel
 fun SettingsScreen(
     viewModel: SettingsViewModel, onBack: () -> Unit, modifier: Modifier = Modifier
 ) {
-    val soundEnabled by viewModel.soundEnabled.collectAsState()
-    val musicEnabled by viewModel.musicEnabled.collectAsState()
+    val settings by viewModel.settings.collectAsState()
 
     Scaffold(
         topBar = {
@@ -86,7 +84,7 @@ fun SettingsScreen(
                 label = "SOUND",
                 icon = Icons.AutoMirrored.Rounded.VolumeUp,
                 color = NeonCyan,
-                checked = soundEnabled,
+                checked = settings.soundEnabled,
                 onCheckedChange = { viewModel.toggleSound(it) })
 
             Spacer(modifier = Modifier.height(20.dp))
@@ -95,7 +93,7 @@ fun SettingsScreen(
                 label = "MUSIC",
                 icon = Icons.Rounded.MusicNote,
                 color = NeonYellow,
-                checked = musicEnabled,
+                checked = settings.musicEnabled,
                 onCheckedChange = { viewModel.toggleMusic(it) })
         }
     }

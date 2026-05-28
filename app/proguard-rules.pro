@@ -49,7 +49,7 @@
 
 
 # Game Models (Keep for persistence/serialization)
--keep class com.jn.numgrid.model.** { *; }
+-keep class com.jn.numgrid.domain.game.** { *; }
 
 # Kotlin Coroutines
 -keepnames class kotlinx.coroutines.internal.MainDispatcherFactory {}

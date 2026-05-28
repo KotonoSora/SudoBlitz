@@ -27,24 +27,24 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalLocale
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.jn.numgrid.data.GameRecord
 import com.jn.numgrid.ui.components.NeonText
 import com.jn.numgrid.ui.components.NeonTitle
 import com.jn.numgrid.ui.theme.DarkBackground
+import com.jn.numgrid.ui.theme.GameTheme
 import com.jn.numgrid.ui.theme.NeonBlue
 import com.jn.numgrid.ui.theme.NeonCyan
 import com.jn.numgrid.ui.theme.NeonMagenta
 import com.jn.numgrid.ui.theme.NeonYellow
 import com.jn.numgrid.ui.theme.SurfaceDark
-import androidx.compose.ui.tooling.preview.Preview
-import com.jn.numgrid.ui.theme.GameTheme
 import com.jn.numgrid.viewmodel.ProgressViewModel
 import java.text.NumberFormat
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
-import androidx.compose.ui.platform.LocalLocale
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -61,14 +61,14 @@ fun ProgressScreen(
         topBar = {
             TopAppBar(
                 title = { }, navigationIcon = {
-                IconButton(onClick = onBack) {
-                    Icon(
-                        Icons.AutoMirrored.Rounded.ArrowBack,
-                        contentDescription = "Back",
-                        tint = NeonBlue
-                    )
-                }
-            }, colors = TopAppBarDefaults.topAppBarColors(containerColor = Color.Transparent)
+                    IconButton(onClick = onBack) {
+                        Icon(
+                            Icons.AutoMirrored.Rounded.ArrowBack,
+                            contentDescription = "Back",
+                            tint = NeonBlue
+                        )
+                    }
+                }, colors = TopAppBarDefaults.topAppBarColors(containerColor = Color.Transparent)
             )
         }, containerColor = DarkBackground
     ) { innerPadding ->
