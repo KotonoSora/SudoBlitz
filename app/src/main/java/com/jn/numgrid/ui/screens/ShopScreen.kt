@@ -45,6 +45,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.jn.numgrid.billing.BillingStatus
 import com.jn.numgrid.billing.StoreProduct
 import com.jn.numgrid.ui.components.NeonText
 import com.jn.numgrid.ui.components.RetroFont
@@ -63,11 +64,17 @@ fun ShopScreen(
 ) {
     val products by viewModel.products.collectAsState()
     val coins by viewModel.coins.collectAsState()
+    val status by viewModel.status.collectAsState()
 
     ShopContent(
-        products = products, coins = coins, onBack = onBack, onBuyProduct = { product, activity ->
+        products = products,
+        coins = coins,
+        status = status,
+        onBack = onBack,
+        onBuyProduct = { product, activity ->
             viewModel.buyProduct(activity, product)
-        }, modifier = modifier
+        },
+        modifier = modifier
     )
 }
 
@@ -76,6 +83,7 @@ fun ShopScreen(
 fun ShopContent(
     products: List<StoreProduct>,
     coins: Int,
+    status: BillingStatus,
     onBack: () -> Unit,
     onBuyProduct: (StoreProduct, android.app.Activity) -> Unit,
     modifier: Modifier = Modifier
@@ -132,8 +140,14 @@ fun ShopContent(
         ) {
             if (products.isEmpty()) {
                 Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                    val message = when (status) {
+                        BillingStatus.CONNECTING -> "Connecting to Store..."
+                        BillingStatus.ERROR -> "Store Unavailable"
+                        BillingStatus.EMPTY -> "No products found"
+                        else -> "Loading store items..."
+                    }
                     NeonText(
-                        text = "Loading store items...",
+                        text = message,
                         color = Color.White.copy(alpha = 0.6f),
                         fontSize = 16
                     )
@@ -219,7 +233,7 @@ fun ProductItem(
                 contentPadding = PaddingValues(horizontal = 4.dp, vertical = 8.dp)
             ) {
                 Text(
-                    text = price,
+                    text = price ?: "Unknown",
                     color = DarkBackground,
                     fontWeight = FontWeight.Bold,
                     textAlign = TextAlign.Center,
@@ -235,11 +249,51 @@ fun ProductItem(
 
 @Preview(showBackground = true)
 @Composable
-fun ShopScreenPreview() {
+fun ShopScreenConnectedPreview() {
     GameTheme {
         ShopContent(
             products = PreviewData.mockProducts,
             coins = 500,
+            status = BillingStatus.CONNECTED,
+            onBack = {},
+            onBuyProduct = { _, _ -> })
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun ShopScreenConnectingPreview() {
+    GameTheme {
+        ShopContent(
+            products = emptyList(),
+            coins = 500,
+            status = BillingStatus.CONNECTING,
+            onBack = {},
+            onBuyProduct = { _, _ -> })
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun ShopScreenErrorPreview() {
+    GameTheme {
+        ShopContent(
+            products = emptyList(),
+            coins = 500,
+            status = BillingStatus.ERROR,
+            onBack = {},
+            onBuyProduct = { _, _ -> })
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun ShopScreenEmptyPreview() {
+    GameTheme {
+        ShopContent(
+            products = emptyList(),
+            coins = 500,
+            status = BillingStatus.EMPTY,
             onBack = {},
             onBuyProduct = { _, _ -> })
     }

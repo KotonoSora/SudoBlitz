@@ -11,7 +11,6 @@ import androidx.datastore.preferences.core.emptyPreferences
 import androidx.datastore.preferences.core.preferencesOf
 import com.jn.numgrid.audio.SoundManager
 import com.jn.numgrid.billing.BillingManager
-import com.jn.numgrid.billing.StoreProduct
 import com.jn.numgrid.data.GameRecord
 import com.jn.numgrid.data.GameRecordDao
 import com.jn.numgrid.data.UserPreferencesRepository
@@ -47,9 +46,7 @@ object PreviewData {
         override fun getHighScore(): Flow<Int?> = flowOf(4200)
     }
 
-    val mockProducts = BillingManager.productIds.map { id ->
-        StoreProduct(id, "${BillingManager.getCoinAmount(id)} Coins", "$0.99", BillingManager.getCoinAmount(id))
-    }
+    val mockProducts = BillingManager.getDebugProducts()
 }
 
 @Composable

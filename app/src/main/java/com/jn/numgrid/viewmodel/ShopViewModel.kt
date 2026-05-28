@@ -27,11 +27,11 @@ class ShopViewModel(
 
     val products: StateFlow<List<StoreProduct>> = billingManager.products
 
+    val status = billingManager.status
+
     val coins: StateFlow<Int> = preferencesRepository.coinsFlow.stateIn(
-            viewModelScope,
-            SharingStarted.Eagerly,
-            500
-        )
+        viewModelScope, SharingStarted.Eagerly, 500
+    )
 
     fun buyProduct(activity: Activity, product: StoreProduct) {
         billingManager.launchBillingFlow(activity, product)
@@ -39,7 +39,7 @@ class ShopViewModel(
 
     override fun onCleared() {
         super.onCleared()
-        billingManager.endConnection()
+        billingManager.release()
     }
 
     companion object {
