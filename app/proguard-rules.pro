@@ -1,21 +1,58 @@
-# Add project specific ProGuard rules here.
-# You can control the set of applied configuration files using the
-# proguardFiles setting in build.gradle.
-#
-# For more details, see
-#   http://developer.android.com/guide/developing/tools/proguard.html
+# Jetpack Compose
+-keepclassmembers class androidx.compose.ui.platform.AndroidComposeView {
+    void *;
+}
+-keep class androidx.compose.runtime.Recomposer { *; }
 
-# If your project uses WebView with JS, uncomment the following
-# and specify the fully qualified class name to the JavaScript interface
-# class:
-#-keepclassmembers class fqcn.of.javascript.interface.for.webview {
-#   public *;
-#}
+# Hilt
+-keep class * extends androidx.lifecycle.ViewModel
 
-# Uncomment this to preserve the line number information for
-# debugging stack traces.
-#-keepattributes SourceFile,LineNumberTable
+# Room
+-keep class * extends androidx.room.RoomDatabase
+-keep class * { @androidx.room.Entity *; }
+-keep class * { @androidx.room.Dao *; }
+-keep class * { @androidx.room.Database *; }
+-keep class * { @androidx.room.TypeConverter *; }
 
-# If you keep the line number information, uncomment this to
-# hide the original source file name.
-#-renamesourcefileattribute SourceFile
+# DataStore
+
+# Retrofit
+-keepattributes Signature, InnerClasses, AnnotationDefault, Metadata
+-keepattributes RuntimeVisibleAnnotations, RuntimeVisibleParameterAnnotations
+-keepattributes RuntimeVisibleTypeAnnotations, AnnotationDefault
+-keepclassmembernames interface * {
+    @retrofit2.http.* <methods>;
+}
+-dontwarn retrofit2.**
+
+# Moshi
+-keep class com.squareup.moshi.** { *; }
+-keepclassmembers class * {
+    @com.squareup.moshi.Json *;
+}
+-dontwarn com.squareup.moshi.**
+
+# OkHttp
+-keepattributes Signature
+-keepattributes *Annotation*
+-keep interface okhttp3.** { *; }
+-dontwarn okhttp3.**
+-dontwarn okio.**
+-dontwarn javax.annotation.**
+-dontwarn org.conscrypt.**
+
+# Coil
+-dontwarn coil.**
+
+# Google Play Billing
+-dontwarn com.android.billingclient.api.**
+
+
+# Game Models (Keep for persistence/serialization)
+-keep class com.jn.numgrid.domain.game.** { *; }
+
+# Kotlin Coroutines
+-keepnames class kotlinx.coroutines.internal.MainDispatcherFactory {}
+-keepnames class kotlinx.coroutines.CoroutineExceptionHandler {}
+-keepnames class kotlinx.coroutines.android.AndroidDispatcherFactory {}
+-dontwarn kotlinx.coroutines.**

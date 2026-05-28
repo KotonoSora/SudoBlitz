@@ -1,0 +1,300 @@
+package com.jn.numgrid.ui.screens
+
+import androidx.activity.compose.LocalActivity
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.rounded.ArrowBack
+import androidx.compose.material.icons.rounded.MonetizationOn
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import com.jn.numgrid.domain.shop.ShopProduct
+import com.jn.numgrid.domain.shop.ShopStatus
+import com.jn.numgrid.ui.components.NeonText
+import com.jn.numgrid.ui.components.RetroFont
+import com.jn.numgrid.ui.theme.CoinGold
+import com.jn.numgrid.ui.theme.DarkBackground
+import com.jn.numgrid.ui.theme.GameTheme
+import com.jn.numgrid.ui.theme.NeonCyan
+import com.jn.numgrid.ui.theme.NeonMagenta
+import com.jn.numgrid.ui.theme.SurfaceDark
+import com.jn.numgrid.viewmodel.ShopViewModel
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun ShopScreen(
+    viewModel: ShopViewModel, onBack: () -> Unit, modifier: Modifier = Modifier
+) {
+    val products by viewModel.products.collectAsState()
+    val coins by viewModel.coins.collectAsState()
+    val status by viewModel.status.collectAsState()
+
+    ShopContent(
+        products = products,
+        coins = coins,
+        status = status,
+        onBack = onBack,
+        onBuyProduct = { product, activity ->
+            viewModel.buyProduct(activity, product)
+        },
+        modifier = modifier
+    )
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun ShopContent(
+    products: List<ShopProduct>,
+    coins: Int,
+    status: ShopStatus,
+    onBack: () -> Unit,
+    onBuyProduct: (ShopProduct, android.app.Activity) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    val activity = LocalActivity.current
+
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                title = {
+                    NeonText("Coin Shop", NeonCyan, fontSize = 24)
+                },
+                navigationIcon = {
+                    IconButton(onClick = onBack) {
+                        Icon(
+                            Icons.AutoMirrored.Rounded.ArrowBack,
+                            contentDescription = "Back",
+                            tint = NeonCyan
+                        )
+                    }
+                },
+                actions = {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier.padding(end = 16.dp)
+                    ) {
+                        Icon(
+                            imageVector = Icons.Rounded.MonetizationOn,
+                            contentDescription = "Coins",
+                            tint = CoinGold,
+                            modifier = Modifier.size(24.dp)
+                        )
+                        Spacer(modifier = Modifier.width(4.dp))
+                        NeonText(
+                            text = coins.toString(), color = CoinGold, fontSize = 18
+                        )
+                    }
+                },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = DarkBackground,
+                    titleContentColor = NeonCyan,
+                    navigationIconContentColor = NeonCyan,
+                    actionIconContentColor = NeonCyan
+                ),
+            )
+        }, modifier = modifier.fillMaxSize(), containerColor = DarkBackground
+    ) { innerPadding ->
+        Column(
+            modifier = Modifier
+                .padding(innerPadding)
+                .fillMaxSize()
+                .background(DarkBackground),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            if (products.isEmpty()) {
+                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                    val message = when (status) {
+                        ShopStatus.CONNECTING -> "Connecting to Store..."
+                        ShopStatus.ERROR -> "Store Unavailable"
+                        ShopStatus.EMPTY -> "No products found"
+                        else -> "Loading store items..."
+                    }
+                    NeonText(
+                        text = message,
+                        color = Color.White.copy(alpha = 0.6f),
+                        fontSize = 16
+                    )
+                }
+            } else {
+                LazyVerticalGrid(
+                    columns = GridCells.Fixed(2),
+                    contentPadding = PaddingValues(16.dp),
+                    horizontalArrangement = Arrangement.spacedBy(16.dp),
+                    verticalArrangement = Arrangement.spacedBy(16.dp),
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    items(products) { product ->
+                        ProductItem(
+                            product = product, onPurchaseClick = {
+                                activity?.let { onBuyProduct(product, it) }
+                            })
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun ProductItem(
+    product: ShopProduct, onPurchaseClick: () -> Unit, modifier: Modifier = Modifier
+) {
+    val price = product.price
+    val coinsAmount = product.coinAmount
+
+    Card(
+        modifier = modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(16.dp),
+        colors = CardDefaults.cardColors(containerColor = SurfaceDark),
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+    ) {
+        Column(
+            modifier = Modifier
+                .padding(16.dp)
+                .fillMaxWidth(),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
+        ) {
+            // Coin Icon / Stack
+            Box(
+                modifier = Modifier
+                    .size(64.dp)
+                    .background(DarkBackground, RoundedCornerShape(16.dp)),
+                contentAlignment = Alignment.Center
+            ) {
+                Icon(
+                    imageVector = Icons.Rounded.MonetizationOn,
+                    contentDescription = null,
+                    tint = CoinGold,
+                    modifier = Modifier.size(40.dp)
+                )
+            }
+
+            Spacer(modifier = Modifier.height(12.dp))
+
+            NeonText(
+                text = "$coinsAmount", color = CoinGold, fontSize = 14
+            )
+
+            Spacer(modifier = Modifier.height(4.dp))
+
+            Text(
+                text = "Coins",
+                style = MaterialTheme.typography.bodyMedium,
+                color = Color.White.copy(alpha = 0.8f)
+            )
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            Button(
+                onClick = onPurchaseClick,
+                shape = RoundedCornerShape(12.dp),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = NeonMagenta, contentColor = DarkBackground
+                ),
+                modifier = Modifier.fillMaxWidth(),
+                contentPadding = PaddingValues(horizontal = 4.dp, vertical = 8.dp)
+            ) {
+                Text(
+                    text = price ?: "Unknown",
+                    color = DarkBackground,
+                    fontWeight = FontWeight.Bold,
+                    textAlign = TextAlign.Center,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                    fontSize = 14.sp,
+                    fontFamily = RetroFont
+                )
+            }
+        }
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun ShopScreenConnectedPreview() {
+    GameTheme {
+        ShopContent(
+            products = PreviewData.mockProducts,
+            coins = 500,
+            status = ShopStatus.CONNECTED,
+            onBack = {},
+            onBuyProduct = { _, _ -> })
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun ShopScreenConnectingPreview() {
+    GameTheme {
+        ShopContent(
+            products = emptyList(),
+            coins = 500,
+            status = ShopStatus.CONNECTING,
+            onBack = {},
+            onBuyProduct = { _, _ -> })
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun ShopScreenErrorPreview() {
+    GameTheme {
+        ShopContent(
+            products = emptyList(),
+            coins = 500,
+            status = ShopStatus.ERROR,
+            onBack = {},
+            onBuyProduct = { _, _ -> })
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun ShopScreenEmptyPreview() {
+    GameTheme {
+        ShopContent(
+            products = emptyList(),
+            coins = 500,
+            status = ShopStatus.EMPTY,
+            onBack = {},
+            onBuyProduct = { _, _ -> })
+    }
+}
