@@ -17,7 +17,7 @@
 # DataStore
 
 # Retrofit
--keepattributes Signature, InnerClasses, AnnotationDefault
+-keepattributes Signature, InnerClasses, AnnotationDefault, Metadata
 -keepattributes RuntimeVisibleAnnotations, RuntimeVisibleParameterAnnotations
 -keepattributes RuntimeVisibleTypeAnnotations, AnnotationDefault
 -keepclassmembernames interface * {

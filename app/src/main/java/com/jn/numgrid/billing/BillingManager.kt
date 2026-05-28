@@ -171,7 +171,7 @@ class BillingManager(
 
         billingClient?.queryProductDetailsAsync(params) { billingResult, result ->
             if (billingResult.responseCode == BillingClient.BillingResponseCode.OK) {
-                val detailsList = result.productDetailsList ?: emptyList()
+                val detailsList = result.productDetailsList
                 if (detailsList.isEmpty()) {
                     _status.value = BillingStatus.EMPTY
                 }
