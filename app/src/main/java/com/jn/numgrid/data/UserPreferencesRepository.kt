@@ -20,7 +20,6 @@ class UserPreferencesRepository(private val dataStore: DataStore<Preferences>) {
         val BEST_STREAK_KEY = intPreferencesKey("best_streak")
         val SOUND_ENABLED_KEY = booleanPreferencesKey("sound_enabled")
         val MUSIC_ENABLED_KEY = booleanPreferencesKey("music_enabled")
-        val HAPTIC_ENABLED_KEY = booleanPreferencesKey("haptic_enabled")
     }
 
     val coinsFlow: Flow<Int> = dataStore.data.map { preferences ->
@@ -81,9 +80,4 @@ class UserPreferencesRepository(private val dataStore: DataStore<Preferences>) {
         }
     }
 
-    suspend fun updateHapticEnabled(enabled: Boolean) {
-        dataStore.edit { preferences ->
-            preferences[HAPTIC_ENABLED_KEY] = enabled
-        }
-    }
 }
