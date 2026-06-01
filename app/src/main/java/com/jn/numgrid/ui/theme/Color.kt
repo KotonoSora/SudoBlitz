@@ -2,14 +2,14 @@ package com.jn.numgrid.ui.theme
 
 import androidx.compose.ui.graphics.Color
 
-val DarkBackground = Color(0xFF0A0A12)
-val NeonGreen = Color(0xFF39FF14)
-val NeonYellow = Color(0xFFFFEA00)
-val NeonCyan = Color(0xFF00FFFF)
-val NeonMagenta = Color(0xFFFF00FF)
-val NeonRed = Color(0xFFFF003C)
-val NeonBlue = Color(0xFF0066FF)
-val SurfaceDark = Color(0xFF1A1A2E)
+val DarkBackground = Color(0xFF0D0221)
+val NeonGreen = Color(0xFF00FF9F)
+val NeonYellow = Color(0xFFF0FF00)
+val NeonCyan = Color(0xFF00E5FF)
+val NeonMagenta = Color(0xFFFF00D4)
+val NeonRed = Color(0xFFFF2D55)
+val NeonBlue = Color(0xFF2979FF)
+val SurfaceDark = Color(0xFF240B36)
 
 val ErrorRed = NeonRed
 val SuccessGreen = NeonGreen
