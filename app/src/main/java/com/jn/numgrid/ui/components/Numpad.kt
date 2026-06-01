@@ -1,6 +1,6 @@
 package com.jn.numgrid.ui.components
 
-import androidx.compose.foundation.border
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -12,14 +12,13 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.jn.numgrid.ui.theme.NeonCyan
-import com.jn.numgrid.ui.theme.SurfaceDark
 
 @Composable
 fun Numpad(
@@ -77,18 +76,18 @@ fun Numpad(
 fun NumpadButton(
     number: Int, onNumberSelected: (Int) -> Unit, modifier: Modifier = Modifier
 ) {
-    val shape = RoundedCornerShape(12.dp)
-    Button(
+    OutlinedButton(
         onClick = { onNumberSelected(number) },
-        shape = shape,
+        shape = RoundedCornerShape(12.dp),
         contentPadding = PaddingValues(0.dp),
-        colors = ButtonDefaults.buttonColors(
-            containerColor = SurfaceDark, contentColor = NeonCyan
+        border = BorderStroke(2.dp, NeonCyan),
+        colors = ButtonDefaults.outlinedButtonColors(
+            containerColor = NeonCyan.copy(alpha = 0.05f),
+            contentColor = NeonCyan
         ),
         modifier = modifier
-            .aspectRatio(0.8f)
+            .aspectRatio(0.85f)
             .padding(4.dp)
-            .border(2.dp, NeonCyan.copy(alpha = 0.5f), shape)
     ) {
         Box(
             modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center

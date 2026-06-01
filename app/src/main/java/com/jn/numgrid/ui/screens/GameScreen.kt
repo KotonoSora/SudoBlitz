@@ -1,6 +1,7 @@
 package com.jn.numgrid.ui.screens
 
 import android.annotation.SuppressLint
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -12,15 +13,17 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.Undo
 import androidx.compose.material.icons.rounded.AccessTime
 import androidx.compose.material.icons.rounded.Lightbulb
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.ElevatedButton
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
@@ -245,22 +248,36 @@ fun BoostButton(
     onClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    ElevatedButton(
+    OutlinedButton(
         onClick = onClick,
         enabled = enabled,
-        modifier = modifier.height(64.dp),
-        contentPadding = PaddingValues(horizontal = 12.dp),
-        colors = ButtonDefaults.elevatedButtonColors(
-            containerColor = MaterialTheme.colorScheme.surfaceVariant, contentColor = NeonCyan
+        modifier = modifier.height(68.dp),
+        shape = RoundedCornerShape(12.dp),
+        border = BorderStroke(
+            width = 2.dp,
+            color = if (enabled) NeonCyan else Color.DarkGray
+        ),
+        contentPadding = PaddingValues(horizontal = 8.dp),
+        colors = ButtonDefaults.outlinedButtonColors(
+            containerColor = if (enabled) NeonCyan.copy(alpha = 0.1f) else Color.Transparent,
+            contentColor = if (enabled) NeonCyan else Color.DarkGray
         )
     ) {
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
-            Icon(imageVector = icon, contentDescription = label)
+            Icon(
+                imageVector = icon,
+                contentDescription = label,
+                modifier = Modifier.size(24.dp)
+            )
             Spacer(modifier = Modifier.height(4.dp))
-            NeonText(text = "$cost Coins", color = NeonYellow, fontSize = 10)
+            NeonText(
+                text = "$cost",
+                color = if (enabled) NeonYellow else Color.DarkGray,
+                fontSize = 12
+            )
         }
     }
 }
