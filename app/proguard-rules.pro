@@ -1,58 +1,80 @@
+# NumGrid ProGuard Rules
+
+# -----------------------------------------------------------------------------------
+# General Rules
+# -----------------------------------------------------------------------------------
+
+# Preserve line number information for debugging stack traces.
+-keepattributes SourceFile,LineNumberTable
+
+# Preserve Annotations and Signatures for Retrofit, Room, and Moshi
+-keepattributes *Annotation*,Signature,InnerClasses,EnclosingMethod
+
+# -----------------------------------------------------------------------------------
 # Jetpack Compose
--keepclassmembers class androidx.compose.ui.platform.AndroidComposeView {
-    void *;
+# -----------------------------------------------------------------------------------
+# Compose rules are generally included in the library, but keeping some common ones.
+-keepclassmembers class androidx.compose.ui.platform.ComposeView {
+   public *;
 }
--keep class androidx.compose.runtime.Recomposer { *; }
 
-# Hilt
--keep class * extends androidx.lifecycle.ViewModel
-
+# -----------------------------------------------------------------------------------
 # Room
+# -----------------------------------------------------------------------------------
 -keep class * extends androidx.room.RoomDatabase
--keep class * { @androidx.room.Entity *; }
--keep class * { @androidx.room.Dao *; }
--keep class * { @androidx.room.Database *; }
--keep class * { @androidx.room.TypeConverter *; }
+-dontwarn androidx.room.paging.**
 
-# DataStore
-
-# Retrofit
--keepattributes Signature, InnerClasses, AnnotationDefault, Metadata
--keepattributes RuntimeVisibleAnnotations, RuntimeVisibleParameterAnnotations
--keepattributes RuntimeVisibleTypeAnnotations, AnnotationDefault
--keepclassmembernames interface * {
-    @retrofit2.http.* <methods>;
-}
+# -----------------------------------------------------------------------------------
+# Retrofit / OkHttp
+# -----------------------------------------------------------------------------------
 -dontwarn retrofit2.**
-
-# Moshi
--keep class com.squareup.moshi.** { *; }
--keepclassmembers class * {
-    @com.squareup.moshi.Json *;
-}
--dontwarn com.squareup.moshi.**
-
-# OkHttp
--keepattributes Signature
--keepattributes *Annotation*
--keep interface okhttp3.** { *; }
+-keep class retrofit2.** { *; }
 -dontwarn okhttp3.**
 -dontwarn okio.**
 -dontwarn javax.annotation.**
--dontwarn org.conscrypt.**
 
-# Coil
--dontwarn coil.**
+# -----------------------------------------------------------------------------------
+# Moshi (for JSON parsing)
+# -----------------------------------------------------------------------------------
+# Retain generic type information for use by Moshi’s adapters.
+-keep class com.squareup.moshi.* { *; }
+-keep class kotlin.reflect.jvm.internal.** { *; }
+-keep @com.squareup.moshi.JsonQualifier interface *
+-keep @com.squareup.moshi.JsonClass class * {
+    <init>(...);
+}
 
-# Google Play Billing
--dontwarn com.android.billingclient.api.**
-
-
-# Game Models (Keep for persistence/serialization)
--keep class com.jn.numgrid.domain.game.** { *; }
-
-# Kotlin Coroutines
+# -----------------------------------------------------------------------------------
+# Coroutines
+# -----------------------------------------------------------------------------------
 -keepnames class kotlinx.coroutines.internal.MainDispatcherFactory {}
 -keepnames class kotlinx.coroutines.CoroutineExceptionHandler {}
 -keepnames class kotlinx.coroutines.android.AndroidDispatcherFactory {}
 -dontwarn kotlinx.coroutines.**
+
+# -----------------------------------------------------------------------------------
+# Google Play Billing
+# -----------------------------------------------------------------------------------
+-keep class com.android.billingclient.** { *; }
+-dontwarn com.android.billingclient.**
+
+# -----------------------------------------------------------------------------------
+# Coil (Image Loading)
+# -----------------------------------------------------------------------------------
+-keep class coil.** { *; }
+-keep class coil.RealImageLoader
+-keepclassmembers class * extends coil.decode.Decoder {
+    public <init>(...);
+}
+-keepclassmembers class * extends coil.fetch.Fetcher {
+    public <init>(...);
+}
+-keepclassmembers class * extends coil.transition.Transition {
+    public <init>(...);
+}
+
+# -----------------------------------------------------------------------------------
+# NumGrid Models
+# -----------------------------------------------------------------------------------
+# Ensure your data models are not obfuscated to avoid issues with Room or Moshi
+-keepclassmembers class com.jn.numgrid.domain.** { *; }
