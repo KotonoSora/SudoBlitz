@@ -32,6 +32,7 @@ captures/
 *.aab
 *.apk
 output-metadata.json
+app/release/
 
 # IntelliJ
 *.iml
@@ -54,6 +55,11 @@ google-services.json
 .agent
 input_images/
 
+.artifacts/
 .kotlin/
-
 app/release/**/*.dm
+keystore.properties
+*.artifact.md
+
+AGENTS.md
+.opencode/
