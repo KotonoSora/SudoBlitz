@@ -4,16 +4,12 @@ import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.EmojiEvents
 import androidx.compose.material.icons.rounded.Event
-import androidx.compose.material.icons.rounded.MonetizationOn
 import androidx.compose.material.icons.rounded.Settings
 import androidx.compose.material.icons.rounded.ShoppingCart
 import androidx.compose.material.icons.rounded.VideogameAsset
@@ -29,11 +25,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import local.sudoku.ui.R
+import local.sudoku.ui.presentation.components.CoinCapsule
 import local.sudoku.ui.presentation.components.NeonButton
-import local.sudoku.ui.presentation.components.NeonText
 import local.sudoku.ui.presentation.components.NeonTitle
-import local.sudoku.ui.presentation.theme.CoinGold
 import local.sudoku.ui.presentation.theme.DarkBackground
 import local.sudoku.ui.presentation.theme.GameTheme
 import local.sudoku.ui.presentation.theme.NeonBlue
@@ -63,15 +59,7 @@ fun HomeScreen(
                         verticalAlignment = Alignment.CenterVertically,
                         modifier = Modifier.padding(end = 16.dp)
                     ) {
-                        Icon(
-                            Icons.Rounded.MonetizationOn,
-                            contentDescription = "Coins",
-                            tint = CoinGold,
-                            modifier = Modifier.size(24.dp)
-                        )
-                        Spacer(modifier = Modifier.width(4.dp))
-                        NeonText(coins.toString(), CoinGold, fontSize = 18)
-                        Spacer(modifier = Modifier.width(16.dp))
+                        CoinCapsule(coins = coins, onClick = onShopClicked)
                         IconButton(onClick = onShopClicked) {
                             Icon(
                                 Icons.Rounded.ShoppingCart,
@@ -84,37 +72,71 @@ fun HomeScreen(
             )
         }, containerColor = DarkBackground
     ) { innerPadding ->
-        Column(
+        HomeScreenContent(
+            onPlayClicked = onPlayClicked,
+            onDailyChallengeClicked = onDailyChallengeClicked,
+            onLeaderboardClicked = onLeaderboardClicked,
+            onSettingsClicked = onSettingsClicked,
             modifier = modifier
                 .padding(innerPadding)
                 .fillMaxSize()
-                .padding(16.dp),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
-        ) {
-            NeonTitle(R.string.app_name, NeonCyan)
-            Spacer(modifier = Modifier.height(48.dp))
+        )
+    }
+}
 
+@Composable
+fun HomeScreenContent(
+    onPlayClicked: () -> Unit,
+    onDailyChallengeClicked: () -> Unit,
+    onLeaderboardClicked: () -> Unit,
+    onSettingsClicked: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Column(
+        modifier = modifier
+            .fillMaxSize()
+            .padding(horizontal = 32.dp),
+        verticalArrangement = Arrangement.SpaceEvenly,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        NeonTitle(R.string.app_name, NeonCyan, fontSize = 40)
+
+        Column(
+            modifier = Modifier.fillMaxWidth(),
+            verticalArrangement = Arrangement.spacedBy(10.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
             NeonButton(
-                "PLAY GAME", NeonGreen, icon = Icons.Rounded.VideogameAsset, onClick = onPlayClicked
+                "PLAY GAME",
+                NeonGreen,
+                icon = Icons.Rounded.VideogameAsset,
+                onClick = onPlayClicked,
+                textSize = 14.sp,
+                height = 56
             )
-            Spacer(modifier = Modifier.height(16.dp))
             NeonButton(
                 "DAILY CHALLENGE",
                 NeonYellow,
                 icon = Icons.Rounded.Event,
-                onClick = onDailyChallengeClicked
+                onClick = onDailyChallengeClicked,
+                textSize = 14.sp,
+                height = 56
             )
-            Spacer(modifier = Modifier.height(16.dp))
             NeonButton(
                 "LEADERBOARD",
                 NeonBlue,
                 icon = Icons.Rounded.EmojiEvents,
-                onClick = onLeaderboardClicked
+                onClick = onLeaderboardClicked,
+                textSize = 14.sp,
+                height = 56
             )
-            Spacer(modifier = Modifier.height(16.dp))
             NeonButton(
-                "SETTINGS", NeonMagenta, icon = Icons.Rounded.Settings, onClick = onSettingsClicked
+                "SETTINGS",
+                NeonMagenta,
+                icon = Icons.Rounded.Settings,
+                onClick = onSettingsClicked,
+                textSize = 14.sp,
+                height = 56
             )
         }
     }

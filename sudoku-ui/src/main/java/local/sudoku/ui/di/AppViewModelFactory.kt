@@ -8,14 +8,13 @@ import local.sudoku.ui.presentation.viewmodel.SettingsViewModel
 import local.sudoku.ui.presentation.viewmodel.ShopViewModel
 
 class AppViewModelFactory(private val container: AppContainer) : ViewModelProvider.Factory {
+    @Suppress("UNCHECKED_CAST")
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         return when {
             modelClass.isAssignableFrom(GameViewModel::class.java) -> {
                 GameViewModel(
                     container.coinAccount,
-                    container.inventoryStore,
                     container.recordGameFinishedUseCase,
-                    container.usePowerUpUseCase,
                     container.startNewGameUseCase,
                     container.nextLevelUseCase,
                     container.inputNumberUseCase,
@@ -27,8 +26,7 @@ class AppViewModelFactory(private val container: AppContainer) : ViewModelProvid
             modelClass.isAssignableFrom(ShopViewModel::class.java) -> {
                 ShopViewModel(
                     container.billingRepository,
-                    container.coinAccount,
-                    container.inventoryStore
+                    container.coinAccount
                 ) as T
             }
 

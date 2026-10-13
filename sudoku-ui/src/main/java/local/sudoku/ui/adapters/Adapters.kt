@@ -4,10 +4,8 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import local.core.billing.CoinSink
 import local.core.ui.data.CoinAccount
-import local.core.ui.data.InventoryStore
 import local.core.ui.data.RunStore
 import local.sudoku.engine.domain.model.RunEndCause
-import local.sudoku.engine.domain.repository.PowerUpStore
 import local.sudoku.engine.domain.repository.RunHistoryRepository
 import local.core.ui.data.RunRecord as CoreRunRecord
 import local.sudoku.engine.domain.model.RunRecord as EngineRunRecord
@@ -19,12 +17,6 @@ import local.sudoku.engine.domain.model.RunRecord as EngineRunRecord
 
 fun CoinAccount.asCoinSink(): CoinSink =
     CoinSink { amount -> addCoins(amount) }
-
-fun InventoryStore.asPowerUpStore(): PowerUpStore =
-    object : PowerUpStore {
-        override suspend fun usePowerUp(typeId: String): Boolean =
-            consumeFromInventory(typeId)
-    }
 
 fun CoreRunRecord.toEngine(): EngineRunRecord =
     EngineRunRecord(

@@ -13,13 +13,13 @@ import local.sudoku.ui.di.LocalAppContainer
 import local.sudoku.ui.infrastructure.audio.LocalSoundManager
 import local.sudoku.ui.presentation.navigation.Screen
 import local.sudoku.ui.presentation.screens.BoostSelectionScreen
+import local.sudoku.ui.presentation.screens.CoinShopScreen
 import local.sudoku.ui.presentation.screens.DailyChallengeScreen
 import local.sudoku.ui.presentation.screens.GameScreen
 import local.sudoku.ui.presentation.screens.HomeScreen
 import local.sudoku.ui.presentation.screens.ProgressScreen
 import local.sudoku.ui.presentation.screens.ResultScreen
 import local.sudoku.ui.presentation.screens.SettingsScreen
-import local.sudoku.ui.presentation.screens.ShopScreen
 import local.sudoku.ui.presentation.viewmodel.GameViewModel
 import local.sudoku.ui.presentation.viewmodel.ProgressViewModel
 import local.sudoku.ui.presentation.viewmodel.SettingsViewModel
@@ -74,7 +74,7 @@ fun MainApp(
                 navController.navigate(Screen.Settings.route)
             }, onShopClicked = {
                 soundManager.playTap()
-                navController.navigate(Screen.Shop.route)
+                navController.navigate(Screen.CoinShop.route)
             })
         }
 
@@ -122,7 +122,7 @@ fun MainApp(
                 },
                 onShopClicked = {
                     soundManager.playTap()
-                    navController.navigate(Screen.Shop.route)
+                    navController.navigate(Screen.CoinShop.route)
                 })
         }
 
@@ -152,9 +152,10 @@ fun MainApp(
             )
         }
 
-        composable(Screen.Shop.route) {
-            ShopScreen(
-                viewModel = shopViewModel, onBack = {
+        composable(Screen.CoinShop.route) {
+            CoinShopScreen(
+                viewModel = shopViewModel,
+                onBack = {
                     navigateBackSafely()
                 })
         }

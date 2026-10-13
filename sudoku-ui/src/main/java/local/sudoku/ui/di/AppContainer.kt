@@ -9,7 +9,6 @@ import local.core.shop.coins.CoinPackIds
 import local.core.shop.coins.CoinPacks
 import local.core.ui.data.AudioSettings
 import local.core.ui.data.CoinAccount
-import local.core.ui.data.InventoryStore
 import local.core.ui.data.RoomRunStore
 import local.core.ui.data.RunStore
 import local.core.ui.data.SettingsRepositoryImpl
@@ -24,15 +23,10 @@ import local.sudoku.engine.application.NextLevelUseCase
 import local.sudoku.engine.application.StartNewGameUseCase
 import local.sudoku.engine.application.UndoMistakeUseCase
 import local.sudoku.engine.application.UseHintUseCase
-import local.sudoku.engine.application.UsePowerUpUseCase
-import local.sudoku.engine.domain.model.PowerUpType
 import local.sudoku.engine.domain.repository.RunHistoryRepository
-import local.sudoku.shop.domain.model.PowerUpShopItem
 import local.sudoku.shop.domain.model.SkinIds
-import local.sudoku.shop.domain.service.PowerUps
 import local.sudoku.shop.infrastructure.persistence.SudokuInventoryKeys
 import local.sudoku.ui.adapters.asCoinSink
-import local.sudoku.ui.adapters.asPowerUpStore
 import local.sudoku.ui.adapters.asRunHistoryRepository
 import local.sudoku.ui.application.RecordGameFinishedUseCase
 import local.sudoku.ui.infrastructure.persistence.SudokuStatsRepository
@@ -42,7 +36,6 @@ import local.sudoku.ui.infrastructure.persistence.SudokuStatsRepository
  */
 interface AppContainer {
     val coinAccount: CoinAccount
-    val inventoryStore: InventoryStore
     val audioSettings: AudioSettings
     val statsRepository: SudokuStatsRepository
     val runHistoryRepository: RunHistoryRepository
@@ -53,7 +46,6 @@ interface AppContainer {
     val inputNumberUseCase: InputNumberUseCase
     val useHintUseCase: UseHintUseCase
     val undoMistakeUseCase: UndoMistakeUseCase
-    val usePowerUpUseCase: UsePowerUpUseCase
     val getHighScoreUseCase: GetHighScoreUseCase
     val getScoreHistoryUseCase: GetScoreHistoryUseCase
     val getAudioSettingsUseCase: GetAudioSettingsUseCase
@@ -69,15 +61,6 @@ class DefaultAppContainer(
     private val isDebug: Boolean
 ) : AppContainer {
 
-    init {
-        // String contract: shop catalog power-up IDs MUST equal engine PowerUpType IDs.
-        check(
-            PowerUpType.entries.map { it.id }.toSet() ==
-                PowerUps.getPowerUpItems()
-                    .map { (it as PowerUpShopItem).inventoryId }.toSet()
-        ) { "Shop catalog power-up IDs diverged from engine PowerUpType IDs" }
-    }
-
     /**
      * Single DataStore-backed store, exposed through narrow ports so each
      * consumer depends only on what it uses. The Sudoku inventory map lives in
@@ -92,7 +75,6 @@ class DefaultAppContainer(
     }
 
     override val coinAccount: CoinAccount by lazy { settingsStore }
-    override val inventoryStore: InventoryStore by lazy { settingsStore }
     override val audioSettings: AudioSettings by lazy { settingsStore }
 
     override val statsRepository: SudokuStatsRepository by lazy {
@@ -144,8 +126,5 @@ class DefaultAppContainer(
     }
     override val recordGameFinishedUseCase: RecordGameFinishedUseCase by lazy {
         RecordGameFinishedUseCase(coinAccount, runHistoryRepository, statsRepository)
-    }
-    override val usePowerUpUseCase: UsePowerUpUseCase by lazy {
-        UsePowerUpUseCase(inventoryStore.asPowerUpStore())
     }
 }

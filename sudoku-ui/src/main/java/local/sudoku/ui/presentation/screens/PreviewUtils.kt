@@ -15,7 +15,6 @@ import local.core.shop.coins.CoinPackItem
 import local.core.shop.coins.CoinPacks
 import local.core.ui.data.AudioSettings
 import local.core.ui.data.CoinAccount
-import local.core.ui.data.InventoryStore
 import local.core.ui.usecase.GetAudioSettingsUseCase
 import local.core.ui.usecase.ToggleAudioUseCase
 import local.sudoku.engine.application.GetHighScoreUseCase
@@ -26,9 +25,6 @@ import local.sudoku.engine.domain.model.RunRecord
 import local.sudoku.engine.domain.model.SudokuEngine
 import local.sudoku.engine.domain.repository.RunHistoryRepository
 import local.sudoku.shop.application.CoinShopConfig
-import local.sudoku.shop.domain.model.PowerUpShopItem
-import local.sudoku.shop.domain.service.PowerUps
-import local.sudoku.ui.adapters.asPowerUpStore
 import local.sudoku.ui.application.RecordGameFinishedUseCase
 import local.sudoku.ui.infrastructure.audio.SoundManager
 import local.sudoku.ui.infrastructure.persistence.SudokuStatsRepository
@@ -37,15 +33,11 @@ import local.sudoku.ui.presentation.viewmodel.GameViewModel
 import local.sudoku.ui.presentation.viewmodel.ProgressViewModel
 import local.sudoku.ui.presentation.viewmodel.SettingsViewModel
 import local.sudoku.ui.presentation.viewmodel.ShopViewModel
-import local.sudoku.engine.application.UsePowerUpUseCase as EngineUsePowerUpUseCase
 
 object PreviewData {
     val mockCoinPacks: List<CoinPackItem> = CoinPacks.mockProducts.map {
         CoinShopConfig.coinPackItem(it)
     }
-
-    val mockPowerUpItems: List<PowerUpShopItem> =
-        PowerUps.getPowerUpItems().filterIsInstance<PowerUpShopItem>()
 
     private val now = System.currentTimeMillis()
     val fakeRuns = listOf(
@@ -77,25 +69,6 @@ private class PreviewCoinAccount(initial: Int = 500) : CoinAccount {
     override suspend fun spendCoins(amount: Int): Boolean {
         if (flow.value < amount) return false
         flow.value -= amount
-        return true
-    }
-}
-
-private class PreviewInventoryStore : InventoryStore {
-    private val flows = mutableMapOf<String, MutableStateFlow<Int>>()
-    private fun flowFor(itemId: String) = flows.getOrPut(itemId) {
-        MutableStateFlow(if (itemId == "hint") 2 else 1)
-    }
-
-    override fun inventoryCountFlow(itemId: String): Flow<Int> = flowFor(itemId)
-    override suspend fun addToInventory(itemId: String) {
-        flowFor(itemId).value += 1
-    }
-
-    override suspend fun consumeFromInventory(itemId: String): Boolean {
-        val flow = flowFor(itemId)
-        if (flow.value <= 0) return false
-        flow.value -= 1
         return true
     }
 }
@@ -171,15 +144,12 @@ fun rememberPreviewGameViewModel(): GameViewModel {
     val context = LocalContext.current
     return remember {
         val coins = PreviewCoinAccount()
-        val inventory = PreviewInventoryStore()
         val runs = PreviewRunHistory(PreviewData.fakeRuns)
         GameViewModel(
             coinAccount = coins,
-            inventoryStore = inventory,
             recordGameFinishedUseCase = RecordGameFinishedUseCase(
                 coins, runs, SudokuStatsRepository(context)
-            ),
-            usePowerUpUseCase = EngineUsePowerUpUseCase(inventory.asPowerUpStore())
+            )
         ).apply {
             setPreviewState(
                 GameState(
@@ -201,8 +171,7 @@ fun rememberPreviewShopViewModel(): ShopViewModel {
     return remember {
         ShopViewModel(
             PreviewBillingRepository(),
-            PreviewCoinAccount(),
-            PreviewInventoryStore()
+            PreviewCoinAccount()
         )
     }
 }

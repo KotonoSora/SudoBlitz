@@ -1,12 +1,12 @@
 package local.sudoku.ui.presentation.screens
 
 import android.annotation.SuppressLint
-import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
@@ -14,17 +14,13 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.Undo
 import androidx.compose.material.icons.rounded.AccessTime
 import androidx.compose.material.icons.rounded.Lightbulb
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
@@ -37,16 +33,18 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalLocale
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import local.sudoku.ui.infrastructure.audio.LocalSoundManager
 import local.sudoku.ui.infrastructure.audio.SoundManager
+import local.sudoku.shop.domain.service.PowerUps
 import local.sudoku.ui.presentation.components.NeonText
 import local.sudoku.ui.presentation.components.Numpad
+import local.sudoku.ui.presentation.components.PowerUpButton
 import local.sudoku.ui.presentation.components.SudokuGrid
 import local.sudoku.ui.presentation.theme.ErrorRed
 import local.sudoku.ui.presentation.theme.GameTheme
@@ -67,9 +65,6 @@ fun GameScreen(
 ) {
     val gameState by viewModel.gameState.collectAsState()
     val coins by viewModel.coins.collectAsState()
-    val extraTimeCount by viewModel.extraTimeCount.collectAsState()
-    val hintCount by viewModel.hintCount.collectAsState()
-    val undoCount by viewModel.undoCount.collectAsState()
 
     // Ensure we only navigate to result if the game was actually in progress
     // and then reached a game over state.
@@ -124,18 +119,32 @@ fun GameScreen(
             )
 
             gameState.board?.let { board ->
-                SudokuGrid(
-                    board = board,
-                    selectedCell = gameState.selectedCell,
-                    onCellSelected = { r, c ->
-                        soundManager.playTap()
-                        viewModel.selectCell(r, c)
-                    },
+                Box(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(horizontal = 24.dp)
-                        .aspectRatio(1f)
-                )
+                        .padding(horizontal = 16.dp, vertical = 12.dp)
+                        .clip(RoundedCornerShape(16.dp))
+                        .background(Color.White.copy(alpha = 0.03f))
+                        .border(
+                            1.dp,
+                            Color.White.copy(alpha = 0.08f),
+                            RoundedCornerShape(16.dp)
+                        ),
+                    contentAlignment = Alignment.Center
+                ) {
+                    SudokuGrid(
+                        board = board,
+                        selectedCell = gameState.selectedCell,
+                        onCellSelected = { r, c ->
+                            soundManager.playTap()
+                            viewModel.selectCell(r, c)
+                        },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(8.dp)
+                            .aspectRatio(1f)
+                    )
+                }
             }
 
             Row(
@@ -144,38 +153,36 @@ fun GameScreen(
                     .padding(horizontal = 16.dp, vertical = 8.dp),
                 horizontalArrangement = Arrangement.SpaceEvenly
             ) {
-                BoostButton(
+                PowerUpButton(
                     icon = Icons.Rounded.AccessTime,
                     label = "+30s",
-                    owned = extraTimeCount,
-                    enabled = extraTimeCount > 0 && !gameState.isGameOver,
+                    enabled = coins >= PowerUps.EXTRA_TIME_COST && !gameState.isGameOver,
                     onClick = {
                         soundManager.playTap()
                         viewModel.addTime()
                     })
-                BoostButton(
+                PowerUpButton(
                     icon = Icons.Rounded.Lightbulb,
                     label = "Hint",
-                    owned = hintCount,
-                    enabled = hintCount > 0 && !gameState.isGameOver,
+                    enabled = coins >= PowerUps.HINT_COST && !gameState.isGameOver,
                     onClick = {
                         soundManager.playTap()
                         viewModel.useHint()
                     })
-                BoostButton(
+                PowerUpButton(
                     icon = Icons.AutoMirrored.Rounded.Undo,
                     label = "Undo",
-                    owned = undoCount,
-                    enabled = undoCount > 0 && gameState.mistakes > 0 && !gameState.isGameOver,
+                    enabled = coins >= PowerUps.UNDO_COST &&
+                        gameState.mistakes > 0 && !gameState.isGameOver,
                     onClick = {
                         soundManager.playTap()
                         viewModel.undoMistake()
                     })
             }
 
-            if (extraTimeCount + hintCount + undoCount == 0) {
+            if (coins < PowerUps.UNDO_COST) {
                 NeonText(
-                    text = "OUT OF BOOSTS — TAP FOR SHOP",
+                    text = "OUT OF COINS — TAP FOR SHOP",
                     color = NeonYellow,
                     fontSize = 12,
                     modifier = Modifier
@@ -251,49 +258,6 @@ fun GameStatsHeader(gameState: GameState, coins: Int, modifier: Modifier = Modif
                 color = NeonYellow,
                 fontSize = 12,
                 modifier = Modifier.align(Alignment.CenterEnd)
-            )
-        }
-    }
-}
-
-@Composable
-fun BoostButton(
-    icon: ImageVector,
-    label: String,
-    owned: Int,
-    enabled: Boolean,
-    onClick: () -> Unit,
-    modifier: Modifier = Modifier
-) {
-    OutlinedButton(
-        onClick = onClick,
-        enabled = enabled,
-        modifier = modifier.height(68.dp),
-        shape = RoundedCornerShape(12.dp),
-        border = BorderStroke(
-            width = 2.dp,
-            color = if (enabled) NeonCyan else Color.DarkGray
-        ),
-        contentPadding = PaddingValues(horizontal = 8.dp),
-        colors = ButtonDefaults.outlinedButtonColors(
-            containerColor = if (enabled) NeonCyan.copy(alpha = 0.1f) else Color.Transparent,
-            contentColor = if (enabled) NeonCyan else Color.DarkGray
-        )
-    ) {
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
-        ) {
-            Icon(
-                imageVector = icon,
-                contentDescription = label,
-                modifier = Modifier.size(24.dp)
-            )
-            Spacer(modifier = Modifier.height(4.dp))
-            NeonText(
-                text = "$label ×$owned",
-                color = if (enabled) NeonYellow else Color.DarkGray,
-                fontSize = 12
             )
         }
     }

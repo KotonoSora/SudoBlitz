@@ -13,18 +13,15 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import local.core.ui.data.CoinAccount
-import local.core.ui.data.InventoryStore
 import local.sudoku.engine.application.InputNumberUseCase
 import local.sudoku.engine.application.NextLevelUseCase
 import local.sudoku.engine.application.StartNewGameUseCase
 import local.sudoku.engine.application.UndoMistakeUseCase
 import local.sudoku.engine.application.UseHintUseCase
-import local.sudoku.engine.application.UsePowerUpUseCase
 import local.sudoku.engine.domain.model.Board
 import local.sudoku.engine.domain.model.Cell
 import local.sudoku.engine.domain.model.Difficulty
 import local.sudoku.engine.domain.model.GameSession
-import local.sudoku.engine.domain.model.PowerUpType
 import local.sudoku.engine.domain.model.RunEndCause
 import local.sudoku.engine.domain.model.RunRecord
 import local.sudoku.engine.domain.service.RewardPolicy
@@ -92,9 +89,7 @@ data class GameState(
 
 class GameViewModel(
     private val coinAccount: CoinAccount,
-    private val inventoryStore: InventoryStore,
     private val recordGameFinishedUseCase: RecordGameFinishedUseCase,
-    private val usePowerUpUseCase: UsePowerUpUseCase,
     private val startNewGameUseCase: StartNewGameUseCase = StartNewGameUseCase(),
     private val nextLevelUseCase: NextLevelUseCase = NextLevelUseCase(),
     private val inputNumberUseCase: InputNumberUseCase = InputNumberUseCase(),
@@ -110,19 +105,6 @@ class GameViewModel(
         SharingStarted.Eagerly,
         0
     )
-
-    val extraTimeCount: StateFlow<Int> =
-        inventoryStore.inventoryCountFlow(PowerUpType.EXTRA_TIME.id).stateIn(
-            viewModelScope, SharingStarted.Eagerly, 0
-        )
-    val hintCount: StateFlow<Int> =
-        inventoryStore.inventoryCountFlow(PowerUpType.HINT.id).stateIn(
-            viewModelScope, SharingStarted.Eagerly, 0
-        )
-    val undoCount: StateFlow<Int> =
-        inventoryStore.inventoryCountFlow(PowerUpType.UNDO.id).stateIn(
-            viewModelScope, SharingStarted.Eagerly, 0
-        )
 
     private var timerJob: Job? = null
     private var sessionStartedAt: Long = System.currentTimeMillis()
@@ -313,7 +295,7 @@ class GameViewModel(
         val state = _gameState.value
         if (state.isGameOver) return
         viewModelScope.launch {
-            if (usePowerUpUseCase(PowerUpType.EXTRA_TIME.id)) {
+            if (coinAccount.spendCoins(PowerUps.EXTRA_TIME_COST)) {
                 sessionExtraTimeUses++
                 _gameState.update { it.copy(timeRemaining = it.timeRemaining + PowerUps.EXTRA_TIME_SECONDS) }
             }
@@ -328,7 +310,7 @@ class GameViewModel(
         if (session.board.cells.flatten().none { it.isEmpty || it.isError }) return
 
         viewModelScope.launch {
-            if (usePowerUpUseCase(PowerUpType.HINT.id)) {
+            if (coinAccount.spendCoins(PowerUps.HINT_COST)) {
                 val nextSession = useHintUseCase.execute(session)
                 sessionHintUses++
                 _gameState.update {
@@ -352,7 +334,7 @@ class GameViewModel(
         if (state.isGameOver || state.mistakes <= 0) return
 
         viewModelScope.launch {
-            if (usePowerUpUseCase(PowerUpType.UNDO.id)) {
+            if (coinAccount.spendCoins(PowerUps.UNDO_COST)) {
                 val nextSession = undoMistakeUseCase.execute(session)
                 sessionUndoUses++
                 _gameState.update {
