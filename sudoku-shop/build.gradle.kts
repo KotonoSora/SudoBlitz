@@ -23,7 +23,4 @@ dependencies {
     implementation(project(":core-shop-coins"))
     implementation(project(":core-ui"))
     implementation(libs.androidx.datastore.preferences)
-
-    testImplementation(libs.junit)
-    testImplementation(project(":sudoku-engine"))
 }

@@ -45,8 +45,5 @@ dependencies {
     // Needed: AppContainer holds GameDatabase, a RoomDatabase subtype.
     implementation(libs.androidx.room.runtime)
 
-    testImplementation(libs.junit)
-    testImplementation(libs.kotlinx.coroutines.test)
-
     debugImplementation(libs.androidx.compose.ui.tooling)
 }
