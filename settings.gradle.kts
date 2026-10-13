@@ -24,3 +24,9 @@ dependencyResolutionManagement {
 
 rootProject.name = "NumGrid"
 include(":app")
+include(":sudoku-engine")
+include(":core-billing")
+include(":core-shop-coins")
+include(":core-ui")
+include(":sudoku-shop")
+include(":sudoku-ui")

@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="desc_back">Back</string>
+    <string name="title_sound">SOUND</string>
+    <string name="label_music">Background Music</string>
+    <string name="desc_music_toggle">Toggle for background music</string>
+    <string name="label_sfx">Sound Effects</string>
+    <string name="desc_sfx_toggle">Toggle for sound effects</string>
+</resources>
